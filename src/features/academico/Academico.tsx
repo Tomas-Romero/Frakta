@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Download, Plus, Upload } from 'lucide-react';
+import { Download, FileSpreadsheet, Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { db, obtenerConfig } from '@/db/db';
@@ -118,6 +118,15 @@ export function Academico() {
         </Button>
         <Button variant="outline" onClick={exportarCsv} disabled={materias.length === 0}>
           <Download /> Exportar CSV
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            void import('./exportMateriasXlsx').then((m) => m.exportarMateriasComoXlsx(materias))
+          }
+          disabled={materias.length === 0}
+        >
+          <FileSpreadsheet /> Exportar Excel
         </Button>
         <CsvAyuda />
         <input

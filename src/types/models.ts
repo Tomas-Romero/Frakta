@@ -89,6 +89,12 @@ export interface SuscripcionRecurrente {
   activa: boolean;
 }
 
+/** Presupuesto mensual por categoría, para el reporte "presupuesto vs. real". */
+export interface Presupuesto {
+  categoria: string; // clave primaria — un presupuesto por categoría
+  montoMensual: number;
+}
+
 // ---------- Gastos compartidos ----------
 // Cada GastoItem lleva su propia lista de participantes: la exclusión por
 // ítem (alguien no consume alcohol, es celíaco, etc.) es simplemente no
@@ -134,6 +140,7 @@ export interface BackupCompleto {
     proyectos: Proyecto[];
     movimientos: MovimientoFinanciero[];
     suscripciones: SuscripcionRecurrente[];
+    presupuestos: Presupuesto[];
     eventosCompartidos: EventoCompartido[];
   };
   config: {

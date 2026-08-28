@@ -28,10 +28,10 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ## Fase 3 — Finanzas (2–3 semanas)
 
-- [ ] Movimientos (gasto/ingreso) + categorías
-- [ ] Suscripciones recurrentes con calendario de vencimientos
-- [ ] Reportes con Recharts (distribución por categoría, presupuesto vs. real)
-- [ ] Exportación Excel estilizada (ExcelJS) para Materias y Finanzas (BLUEPRINT.md sección 2.1)
+- [x] Movimientos (gasto/ingreso) + categorías
+- [x] Suscripciones recurrentes con calendario de vencimientos
+- [x] Reportes con Recharts (distribución por categoría, presupuesto vs. real)
+- [x] Exportación Excel estilizada (ExcelJS) para Materias y Finanzas (BLUEPRINT.md sección 2.1)
 
 ## Fase 4 — Gastos compartidos (1–2 semanas)
 
@@ -50,4 +50,4 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ---
 
-**Estado actual: Fases 0, 1 y 2 completas. Fase 3 (Finanzas) sin empezar.**
+**Estado actual: Fases 0, 1, 2 y 3 completas. Fase 4 (Gastos compartidos) sin empezar.**

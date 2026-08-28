@@ -82,6 +82,11 @@ const suscripcionRecurrenteSchema = z.object({
   activa: z.boolean(),
 });
 
+const presupuestoSchema = z.object({
+  categoria: z.string().min(1),
+  montoMensual: z.number().min(0),
+});
+
 const participanteSchema = z.object({
   id: z.string(),
   nombre: z.string(),
@@ -113,6 +118,7 @@ export const backupCompletoSchema = z.object({
     proyectos: z.array(proyectoSchema),
     movimientos: z.array(movimientoFinancieroSchema),
     suscripciones: z.array(suscripcionRecurrenteSchema),
+    presupuestos: z.array(presupuestoSchema),
     eventosCompartidos: z.array(eventoCompartidoSchema),
   }),
   config: z.object({

@@ -6,10 +6,11 @@ import type {
   Proyecto,
   MovimientoFinanciero,
   SuscripcionRecurrente,
+  Presupuesto,
   EventoCompartido,
 } from '../types/models';
 
-export const SCHEMA_VERSION_ACTUAL = 1;
+export const SCHEMA_VERSION_ACTUAL = 2;
 
 export interface ConfigApp {
   id: 'app';
@@ -24,13 +25,14 @@ export class OrganizadorDB extends Dexie {
   proyectos!: EntityTable<Proyecto, 'id'>;
   movimientos!: EntityTable<MovimientoFinanciero, 'id'>;
   suscripciones!: EntityTable<SuscripcionRecurrente, 'id'>;
+  presupuestos!: EntityTable<Presupuesto, 'categoria'>;
   eventosCompartidos!: EntityTable<EventoCompartido, 'id'>;
   config!: EntityTable<ConfigApp, 'id'>;
 
   constructor() {
     super('organizador-local-first');
 
-    this.version(SCHEMA_VERSION_ACTUAL).stores({
+    this.version(1).stores({
       materias: 'id, anioCursado, estado',
       bloquesHorario: 'id, materiaId, dia',
       tareas: 'id, estado, prioridad, fechaLimite, materiaId, proyectoId',
@@ -39,6 +41,11 @@ export class OrganizadorDB extends Dexie {
       suscripciones: 'id, activa, diaDelMes',
       eventosCompartidos: 'id',
       config: 'id',
+    });
+
+    // v2: agrega presupuestos por categoría (BLUEPRINT.md sección 5 — Fase 3).
+    this.version(SCHEMA_VERSION_ACTUAL).stores({
+      presupuestos: 'categoria',
     });
   }
 }

@@ -5,10 +5,14 @@ import { backupCompletoSchema, type BackupCompletoValidado } from './backupSchem
 import type { BackupCompleto } from '../types/models';
 
 // Cada función v -> v+1 transforma el JSON crudo de esa versión a la
-// siguiente. Vacío hoy porque SCHEMA_VERSION_ACTUAL es 1 (nada que migrar
-// todavía); agregar una entrada acá en cada bump de versión futuro.
-// Ver docs/BLUEPRINT.md sección 3.
-const migraciones: Record<number, (json: unknown) => unknown> = {};
+// siguiente. Ver docs/BLUEPRINT.md sección 3.
+const migraciones: Record<number, (json: unknown) => unknown> = {
+  // v1 no tenía presupuestos por categoría (agregado en Fase 3).
+  1: (json) => {
+    const j = json as { datos?: Record<string, unknown> };
+    return { ...j, datos: { ...j.datos, presupuestos: j.datos?.presupuestos ?? [] } };
+  },
+};
 
 /**
  * Recibe el JSON crudo de un backup y lo lleva a la forma de la versión
@@ -37,8 +41,8 @@ export function migrarBackup(json: unknown): unknown {
     if (!migrar) {
       throw new Error(`Falta la migración de la versión ${version} a ${version + 1}.`);
     }
-    resultado = migrar(resultado);
     version += 1;
+    resultado = { ...(migrar(resultado) as Record<string, unknown>), schemaVersion: version };
   }
   return resultado;
 }
@@ -51,6 +55,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
     proyectos,
     movimientos,
     suscripciones,
+    presupuestos,
     eventosCompartidos,
     config,
   ] = await Promise.all([
@@ -60,6 +65,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
     db.proyectos.toArray(),
     db.movimientos.toArray(),
     db.suscripciones.toArray(),
+    db.presupuestos.toArray(),
     db.eventosCompartidos.toArray(),
     obtenerConfig(),
   ]);
@@ -75,6 +81,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
       proyectos,
       movimientos,
       suscripciones,
+      presupuestos,
       eventosCompartidos,
     },
     config: { tema: config.tema, escalaNotas: config.escalaNotas },
@@ -117,6 +124,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
       db.proyectos,
       db.movimientos,
       db.suscripciones,
+      db.presupuestos,
       db.eventosCompartidos,
       db.config,
     ],
@@ -128,6 +136,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.proyectos.clear(),
         db.movimientos.clear(),
         db.suscripciones.clear(),
+        db.presupuestos.clear(),
         db.eventosCompartidos.clear(),
         db.config.clear(),
       ]);
@@ -139,6 +148,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.proyectos.bulkAdd(backup.datos.proyectos),
         db.movimientos.bulkAdd(backup.datos.movimientos),
         db.suscripciones.bulkAdd(backup.datos.suscripciones),
+        db.presupuestos.bulkAdd(backup.datos.presupuestos),
         db.eventosCompartidos.bulkAdd(backup.datos.eventosCompartidos),
         db.config.add({ id: 'app', ...backup.config }),
       ]);
