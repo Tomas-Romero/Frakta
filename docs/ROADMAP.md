@@ -35,9 +35,9 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ## Fase 4 — Gastos compartidos (1–2 semanas)
 
-- [ ] Participantes y gastos con exclusión por ítem (BLUEPRINT.md sección 2.3)
-- [ ] Algoritmo de liquidación mínima
-- [ ] Vista "quién le debe a quién"
+- [x] Participantes y gastos con exclusión por ítem (BLUEPRINT.md sección 2.3)
+- [x] Algoritmo de liquidación mínima
+- [x] Vista "quién le debe a quién"
 
 ## Fase 5 — Pulido y PWA (1–2 semanas)
 
@@ -50,4 +50,4 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ---
 
-**Estado actual: Fases 0, 1, 2 y 3 completas. Fase 4 (Gastos compartidos) sin empezar.**
+**Estado actual: Fases 0 a 4 completas. Fase 5 (Pulido y PWA) sin empezar.**
