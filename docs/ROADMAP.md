@@ -14,11 +14,11 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ## Fase 1 — MVP académico (2–3 semanas)
 
-- [ ] CRUD de Materias
-- [ ] Métricas: promedio general, promedio sin aplazos, % de avance de la carrera, horas completadas
-- [ ] Horario con fusión de celdas por CSS Grid (BLUEPRINT.md sección 2.2)
-- [ ] Import/export CSV de materias
-- [ ] Panel de ayuda con el formato de columnas esperado del CSV
+- [x] CRUD de Materias
+- [x] Métricas: promedio general, promedio sin aplazos, % de avance de la carrera, horas completadas
+- [x] Horario con fusión de celdas por CSS Grid (BLUEPRINT.md sección 2.2)
+- [x] Import/export CSV de materias
+- [x] Panel de ayuda con el formato de columnas esperado del CSV
 
 ## Fase 2 — Productividad (2 semanas)
 
@@ -50,4 +50,4 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ---
 
-**Estado actual: Fase 0 completa. Fase 1 (MVP académico) sin empezar.**
+**Estado actual: Fase 0 y Fase 1 completas. Fase 2 (Productividad) sin empezar.**
