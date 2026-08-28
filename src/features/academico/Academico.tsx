@@ -7,6 +7,7 @@ import { db, obtenerConfig } from '@/db/db';
 import { formatNumeroAr } from '@/lib/numeroAr';
 import { MateriasList } from './MateriasList';
 import { MateriaForm } from './MateriaForm';
+import { NotaNecesariaDialog } from './NotaNecesariaDialog';
 import { CsvAyuda } from './CsvAyuda';
 import { importarMateriasDesdeCsv, exportarMateriasComoCsv } from './csv';
 import {
@@ -27,6 +28,7 @@ export function Academico() {
   const config = useLiveQuery(() => obtenerConfig());
   const [formAbierto, setFormAbierto] = useState(false);
   const [materiaEditando, setMateriaEditando] = useState<Materia | undefined>(undefined);
+  const [materiaCalculando, setMateriaCalculando] = useState<Materia | null>(null);
   const [estadoImportacion, setEstadoImportacion] = useState<EstadoImportacion>({
     tipo: 'inactivo',
   });
@@ -141,13 +143,24 @@ export function Academico() {
         </p>
       )}
 
-      <MateriasList materias={materias} onEditar={abrirEdicion} />
+      <MateriasList
+        materias={materias}
+        onEditar={abrirEdicion}
+        onCalcularNota={setMateriaCalculando}
+      />
 
       <MateriaForm
         open={formAbierto}
         onOpenChange={setFormAbierto}
         materia={materiaEditando}
         materiasDisponibles={materias}
+        escalaNotas={escalaNotas}
+      />
+
+      <NotaNecesariaDialog
+        open={materiaCalculando !== null}
+        onOpenChange={(open) => !open && setMateriaCalculando(null)}
+        materia={materiaCalculando}
         escalaNotas={escalaNotas}
       />
     </div>

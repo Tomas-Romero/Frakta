@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import { PomodoroWidget } from '@/components/pomodoro/PomodoroWidget';
 import { useUiStore } from '@/store/uiStore';
 import { Dashboard } from '@/features/dashboard/Dashboard';
 import { Tareas } from '@/features/tareas/Tareas';
@@ -40,6 +41,7 @@ export function AppShell() {
           <VistaActual vista={vistaActiva} />
         </main>
       </SidebarInset>
+      {vistaActiva !== 'ajustes' && <PomodoroWidget />}
     </SidebarProvider>
   );
 }

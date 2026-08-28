@@ -1,5 +1,74 @@
-import { ModuloEnConstruccion } from '@/components/layout/ModuloEnConstruccion';
+import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { db } from '@/db/db';
+import { ListaTareas } from './ListaTareas';
+import { KanbanTareas } from './KanbanTareas';
+import { TareaForm } from './TareaForm';
+import type { Tarea } from '@/types/models';
 
 export function Tareas() {
-  return <ModuloEnConstruccion titulo="Tareas" fase="Fase 2 — Productividad" />;
+  const tareas = useLiveQuery(() => db.tareas.toArray(), [], []);
+  const proyectos = useLiveQuery(() => db.proyectos.toArray(), [], []);
+  const materias = useLiveQuery(() => db.materias.toArray(), [], []);
+  const [vista, setVista] = useState<'lista' | 'kanban'>('lista');
+  const [formAbierto, setFormAbierto] = useState(false);
+  const [tareaEditando, setTareaEditando] = useState<Tarea | undefined>(undefined);
+
+  if (!tareas || !proyectos || !materias) return null;
+
+  const proyectosPorId = new Map(proyectos.map((p) => [p.id, p]));
+  const materiasPorId = new Map(materias.map((m) => [m.id, m]));
+
+  function abrirNueva() {
+    setTareaEditando(undefined);
+    setFormAbierto(true);
+  }
+
+  function abrirEdicion(tarea: Tarea) {
+    setTareaEditando(tarea);
+    setFormAbierto(true);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Tabs value={vista} onValueChange={(v) => setVista(v as 'lista' | 'kanban')}>
+          <TabsList>
+            <TabsTrigger value="lista">Lista</TabsTrigger>
+            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Button onClick={abrirNueva}>
+          <Plus /> Nueva tarea
+        </Button>
+      </div>
+
+      {vista === 'lista' ? (
+        <ListaTareas
+          tareas={tareas}
+          proyectosPorId={proyectosPorId}
+          materiasPorId={materiasPorId}
+          onEditar={abrirEdicion}
+        />
+      ) : (
+        <KanbanTareas
+          tareas={tareas}
+          proyectosPorId={proyectosPorId}
+          materiasPorId={materiasPorId}
+          onEditar={abrirEdicion}
+        />
+      )}
+
+      <TareaForm
+        open={formAbierto}
+        onOpenChange={setFormAbierto}
+        tarea={tareaEditando}
+        proyectos={proyectos}
+        materias={materias}
+      />
+    </div>
+  );
 }

@@ -22,9 +22,9 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ## Fase 2 — Productividad (2 semanas)
 
-- [ ] Tareas: vista Lista + Kanban con dnd-kit
-- [ ] Pomodoro anclado a la tarea activa
-- [ ] Calculadora de nota necesaria integrada a la ficha de Materia (BLUEPRINT.md sección 5)
+- [x] Tareas: vista Lista + Kanban con dnd-kit
+- [x] Pomodoro anclado a la tarea activa
+- [x] Calculadora de nota necesaria integrada a la ficha de Materia (BLUEPRINT.md sección 5)
 
 ## Fase 3 — Finanzas (2–3 semanas)
 
@@ -50,4 +50,4 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ---
 
-**Estado actual: Fase 0 y Fase 1 completas. Fase 2 (Productividad) sin empezar.**
+**Estado actual: Fases 0, 1 y 2 completas. Fase 3 (Finanzas) sin empezar.**

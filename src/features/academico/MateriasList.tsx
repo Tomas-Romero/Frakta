@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Calculator, Pencil, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -34,9 +34,10 @@ const COLOR_ESTADO: Record<EstadoMateria, string> = {
 interface MateriasListProps {
   materias: Materia[];
   onEditar: (materia: Materia) => void;
+  onCalcularNota: (materia: Materia) => void;
 }
 
-export function MateriasList({ materias, onEditar }: MateriasListProps) {
+export function MateriasList({ materias, onEditar, onCalcularNota }: MateriasListProps) {
   const [aEliminar, setAEliminar] = useState<Materia | null>(null);
 
   if (materias.length === 0) {
@@ -74,6 +75,14 @@ export function MateriasList({ materias, onEditar }: MateriasListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="flex justify-end gap-1 text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title="¿Qué necesito para aprobar?"
+                    onClick={() => onCalcularNota(m)}
+                  >
+                    <Calculator />
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => onEditar(m)}>
                     <Pencil />
                   </Button>
