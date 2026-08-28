@@ -1,5 +1,4 @@
 import {
-  LayoutDashboard,
   ListTodo,
   CalendarClock,
   GraduationCap,
@@ -23,7 +22,7 @@ import { useUiStore, type Vista } from '@/store/uiStore';
 
 // Orden por frecuencia de uso esperada, no alfabético.
 // Ver docs/BLUEPRINT.md sección 1.
-const MODULOS_CONTENIDO: { vista: Vista; etiqueta: string; icono: typeof LayoutDashboard }[] = [
+const MODULOS_CONTENIDO: { vista: Vista; etiqueta: string; icono: typeof ListTodo }[] = [
   { vista: 'tareas', etiqueta: 'Tareas', icono: ListTodo },
   { vista: 'horario', etiqueta: 'Horario', icono: CalendarClock },
   { vista: 'academico', etiqueta: 'Académico', icono: GraduationCap },
@@ -45,8 +44,8 @@ export function AppSidebar() {
               onClick={() => irA('dashboard')}
               isActive={vistaActiva === 'dashboard'}
             >
-              <LayoutDashboard />
-              <span className="font-semibold">Organizador</span>
+              <img src="/logo.png" alt="" className="size-6 shrink-0 object-contain" />
+              <span className="brand-gradient-text font-semibold">Frakta</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

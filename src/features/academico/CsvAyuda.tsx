@@ -13,8 +13,9 @@ export function CsvAyuda() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" title="Formato del CSV">
+        <Button variant="ghost">
           <HelpCircle />
+          Formato del CSV
         </Button>
       </DialogTrigger>
       <DialogContent>

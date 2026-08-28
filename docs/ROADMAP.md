@@ -41,13 +41,13 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ## Fase 5 — Pulido y PWA (1–2 semanas)
 
-- [ ] Modo oscuro/claro completo
-- [ ] Responsive mobile: barra inferior de 4 slots (BLUEPRINT.md sección 1)
-- [ ] Recordatorios nivel garantizado + nivel de mejor esfuerzo (BLUEPRINT.md sección 5)
-- [ ] `vite-plugin-pwa` configurado
-- [ ] `navigator.storage.persist()` solicitado al usuario
-- [ ] Instructivo de importación visible desde el módulo Académico
+- [x] Modo oscuro/claro completo
+- [x] Responsive mobile: barra inferior de 4 slots (BLUEPRINT.md sección 1)
+- [x] Recordatorios nivel garantizado + nivel de mejor esfuerzo (BLUEPRINT.md sección 5)
+- [x] `vite-plugin-pwa` configurado
+- [x] `navigator.storage.persist()` solicitado al usuario
+- [x] Instructivo de importación visible desde el módulo Académico
 
 ---
 
-**Estado actual: Fases 0 a 4 completas. Fase 5 (Pulido y PWA) sin empezar.**
+**Estado actual: las 6 fases completas. Ver "Estado actual" en `CLAUDE.md` para el detalle de qué se hizo en cada una.**

@@ -56,7 +56,7 @@ export function PomodoroWidget() {
   const progreso = 1 - segundosRestantes / duracionTotal;
 
   return (
-    <div className="fixed right-4 bottom-4 z-40 w-64 overflow-hidden rounded-xl border bg-card text-card-foreground shadow-lg">
+    <div className="fixed right-4 bottom-20 z-40 w-64 overflow-hidden rounded-xl border bg-card text-card-foreground shadow-lg md:bottom-4">
       <div className="flex items-center justify-between border-b px-3 py-2">
         <span className="truncate text-xs font-medium text-muted-foreground">
           {modo === 'trabajo' ? 'Enfoque' : 'Descanso'} · {tituloTareaActiva}
