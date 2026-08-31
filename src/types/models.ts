@@ -35,7 +35,9 @@ export type DiaSemana =
 
 export interface BloqueHorario {
   id: string;
-  materiaId: string;
+  materiaId: string | null; // null si es una actividad libre (ver `titulo`)
+  titulo: string | null; // nombre de la actividad cuando materiaId es null (ej. "Gimnasio")
+  icono: string | null; // nombre de ícono lucide-react (ej. "Dumbbell"), opcional para cualquier bloque
   dia: DiaSemana;
   horaInicioMin: number; // minutos desde 00:00 (ej. 540 = 09:00)
   horaFinMin: number;
@@ -146,5 +148,7 @@ export interface BackupCompleto {
   config: {
     tema: 'auto' | 'claro' | 'oscuro';
     escalaNotas: '1-10' | '0-100';
+    recordatoriosActivos: boolean;
+    almacenamientoPersistenteActivo: boolean;
   };
 }

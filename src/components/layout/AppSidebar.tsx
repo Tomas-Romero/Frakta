@@ -33,6 +33,7 @@ const MODULOS_CONTENIDO: { vista: Vista; etiqueta: string; icono: typeof ListTod
 export function AppSidebar() {
   const vistaActiva = useUiStore((s) => s.vistaActiva);
   const irA = useUiStore((s) => s.irA);
+  const recordatorioBackup = useUiStore((s) => s.recordatorioBackupPendiente);
 
   return (
     <Sidebar collapsible="icon">
@@ -79,9 +80,14 @@ export function AppSidebar() {
             <SidebarMenuButton
               onClick={() => irA('ajustes')}
               isActive={vistaActiva === 'ajustes'}
-              tooltip="Ajustes & Backup"
+              tooltip={recordatorioBackup ? 'Ajustes & Backup — hace más de 14 días que no exportás' : 'Ajustes & Backup'}
             >
-              <Settings />
+              <span className="relative">
+                <Settings />
+                {recordatorioBackup && (
+                  <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-brand-gold" />
+                )}
+              </span>
               <span>Ajustes & Backup</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, obtenerConfig, type ConfigApp } from '@/db/db';
+import { obtenerConfig, actualizarConfig, type ConfigApp } from '@/db/db';
 import { aplicarTema, temaCacheado } from '@/lib/tema';
 
 /**
@@ -24,6 +24,5 @@ export function useTema(): ConfigApp['tema'] {
 }
 
 export async function cambiarTema(tema: ConfigApp['tema']): Promise<void> {
-  const actual = await obtenerConfig();
-  await db.config.put({ ...actual, tema });
+  await actualizarConfig({ tema });
 }

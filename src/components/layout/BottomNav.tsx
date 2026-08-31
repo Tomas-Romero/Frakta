@@ -31,6 +31,7 @@ const MODULOS_EN_MAS: { vista: Vista; etiqueta: string; icono: typeof LayoutDash
 export function BottomNav() {
   const vistaActiva = useUiStore((s) => s.vistaActiva);
   const irA = useUiStore((s) => s.irA);
+  const recordatorioBackup = useUiStore((s) => s.recordatorioBackupPendiente);
   const [masAbierto, setMasAbierto] = useState(false);
 
   const masActivo = MODULOS_EN_MAS.some((m) => m.vista === vistaActiva);
@@ -62,7 +63,12 @@ export function BottomNav() {
             masActivo ? 'text-sidebar-primary' : 'text-sidebar-foreground/60 hover:text-sidebar-foreground',
           )}
         >
-          <MoreHorizontal className="size-5" />
+          <span className="relative">
+            <MoreHorizontal className="size-5" />
+            {recordatorioBackup && (
+              <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-brand-gold" />
+            )}
+          </span>
           Más
         </button>
       </nav>
@@ -86,7 +92,12 @@ export function BottomNav() {
                   vistaActiva === vista ? 'border-primary bg-accent text-accent-foreground' : '',
                 )}
               >
-                <Icono className="size-5" />
+                <span className="relative">
+                  <Icono className="size-5" />
+                  {vista === 'ajustes' && recordatorioBackup && (
+                    <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-brand-gold" />
+                  )}
+                </span>
                 {etiqueta}
               </button>
             ))}

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Plus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -21,17 +22,26 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { crearTarea, actualizarTarea } from '@/db/repositorios/tareas';
+import { ProyectoForm } from './ProyectoForm';
 import type { Materia, Prioridad, Proyecto, Tarea, TipoTarea } from '@/types/models';
 
 const TIPOS: TipoTarea[] = ['academica', 'personal', 'proyecto', 'idea'];
+const ETIQUETA_TIPO: Record<TipoTarea, string> = {
+  academica: 'Académica',
+  personal: 'Personal',
+  proyecto: 'De proyecto',
+  idea: 'Idea',
+};
 const PRIORIDADES: Prioridad[] = ['alta', 'media', 'baja'];
 const SIN_ASIGNAR = '__ninguno__';
+const CREAR_PROYECTO = '__crear_proyecto__';
 
 const esquemaFormulario = z.object({
   titulo: z.string().trim().min(1, 'Ingresá un título'),
@@ -74,6 +84,8 @@ interface TareaFormProps {
 }
 
 export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: TareaFormProps) {
+  const [proyectoFormAbierto, setProyectoFormAbierto] = useState(false);
+
   const form = useForm<ValoresFormulario>({
     resolver: zodResolver(esquemaFormulario),
     defaultValues: valoresPorDefecto(tarea),
@@ -107,8 +119,9 @@ export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: Ta
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{tarea ? 'Editar tarea' : 'Nueva tarea'}</DialogTitle>
         </DialogHeader>
@@ -145,11 +158,12 @@ export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: Ta
                       <SelectContent>
                         {TIPOS.map((t) => (
                           <SelectItem key={t} value={t}>
-                            {t}
+                            {ETIQUETA_TIPO[t]}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription>La categoría general de la tarea.</FormDescription>
                   </FormItem>
                 )}
               />
@@ -178,7 +192,7 @@ export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: Ta
               />
             </div>
 
-            {tipo === 'academica' && materias.length > 0 && (
+            {tipo === 'academica' && (
               <FormField
                 control={form.control}
                 name="materiaId"
@@ -200,37 +214,60 @@ export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: Ta
                         ))}
                       </SelectContent>
                     </Select>
+                    {materias.length === 0 && (
+                      <FormDescription>
+                        No tenés materias cargadas — creá una desde Académico si querés vincular
+                        esta tarea.
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
             )}
 
-            {proyectos.length > 0 && (
-              <FormField
-                control={form.control}
-                name="proyectoId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Proyecto (opcional)</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={SIN_ASIGNAR}>Sin proyecto</SelectItem>
-                        {proyectos.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            {p.nombre}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="proyectoId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Proyecto</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => {
+                      if (v === CREAR_PROYECTO) {
+                        setProyectoFormAbierto(true);
+                        return;
+                      }
+                      field.onChange(v);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={SIN_ASIGNAR}>Sin proyecto</SelectItem>
+                      {proyectos.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.nombre}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value={CREAR_PROYECTO}>
+                        <span className="flex items-center gap-1.5 text-primary">
+                          <Plus className="size-3.5" /> Crear proyecto nuevo…
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Opcional, e independiente del tipo — agrupa esta tarea con otras del mismo
+                    proyecto (ej. varias tareas "de proyecto", "académicas" o "personales" que
+                    apuntan a lo mismo).
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -258,5 +295,12 @@ export function TareaForm({ open, onOpenChange, tarea, proyectos, materias }: Ta
         </Form>
       </DialogContent>
     </Dialog>
+
+    <ProyectoForm
+      open={proyectoFormAbierto}
+      onOpenChange={setProyectoFormAbierto}
+      onGuardado={(proyecto) => form.setValue('proyectoId', proyecto.id)}
+    />
+    </>
   );
 }

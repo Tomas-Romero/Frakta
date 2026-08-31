@@ -16,6 +16,8 @@ export interface ConfigApp {
   id: 'app';
   tema: 'auto' | 'claro' | 'oscuro';
   escalaNotas: '1-10' | '0-100';
+  recordatoriosActivos: boolean;
+  almacenamientoPersistenteActivo: boolean;
 }
 
 export class OrganizadorDB extends Dexie {
@@ -52,7 +54,28 @@ export class OrganizadorDB extends Dexie {
 
 export const db = new OrganizadorDB();
 
+const CONFIG_POR_DEFECTO: ConfigApp = {
+  id: 'app',
+  tema: 'auto',
+  escalaNotas: '1-10',
+  recordatoriosActivos: true,
+  almacenamientoPersistenteActivo: true,
+};
+
 export async function obtenerConfig(): Promise<ConfigApp> {
   const config = await db.config.get('app');
-  return config ?? { id: 'app', tema: 'auto', escalaNotas: '1-10' };
+  return config ? { ...CONFIG_POR_DEFECTO, ...config } : CONFIG_POR_DEFECTO;
+}
+
+/**
+ * Lectura + escritura envuelta en una transacción: dos llamadas concurrentes
+ * (ej. togglear dos switches casi al mismo tiempo) no deben pisarse una a la
+ * otra — sin la transacción, ambas leen el mismo estado viejo y la última en
+ * escribir gana, perdiendo el cambio de la otra.
+ */
+export async function actualizarConfig(cambios: Partial<Omit<ConfigApp, 'id'>>): Promise<void> {
+  await db.transaction('rw', db.config, async () => {
+    const actual = await db.config.get('app');
+    await db.config.put({ ...CONFIG_POR_DEFECTO, ...actual, ...cambios });
+  });
 }

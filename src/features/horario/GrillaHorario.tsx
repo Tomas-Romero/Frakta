@@ -8,6 +8,7 @@ import {
   layoutDia,
   minutosATexto,
 } from './layoutSemana';
+import { ICONOS_ACTIVIDAD, esIconoActividadValido } from './iconosActividad';
 import type { BloqueHorario, DiaSemana, Materia } from '@/types/models';
 
 const ALTO_SLOT_PX = 24;
@@ -78,7 +79,9 @@ export function GrillaHorario({
             style={{ gridColumn: diaIndex + 2, gridRow: `2 / span ${TOTAL_SLOTS}` }}
           >
             {layoutDia(bloquesPorDia[dia]).map((b) => {
-              const materia = materiasPorId.get(b.materiaId);
+              const materia = b.materiaId ? materiasPorId.get(b.materiaId) : undefined;
+              const titulo = materia?.nombre ?? b.titulo ?? '—';
+              const Icono = b.icono && esIconoActividadValido(b.icono) ? ICONOS_ACTIVIDAD[b.icono] : null;
               return (
                 <button
                   key={b.id}
@@ -93,7 +96,10 @@ export function GrillaHorario({
                     background: b.color,
                   }}
                 >
-                  <p className="truncate font-semibold">{materia?.nombre ?? '—'}</p>
+                  <p className="flex items-center gap-1 truncate font-semibold">
+                    {Icono && <Icono className="size-3 shrink-0" />}
+                    <span className="truncate">{titulo}</span>
+                  </p>
                   <p className="truncate opacity-90">
                     {minutosATexto(b.horaInicioMin)}–{minutosATexto(b.horaFinMin)}
                     {b.aula ? ` · ${b.aula}` : ''}

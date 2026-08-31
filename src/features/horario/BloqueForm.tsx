@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Ban } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -27,26 +28,44 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { cn } from '@/lib/utils';
 import { crearBloque, actualizarBloque } from '@/db/repositorios/bloquesHorario';
 import { textoAMinutos, minutosATexto, DIAS, ETIQUETA_DIA } from './layoutSemana';
+import { ICONOS_ACTIVIDAD, NOMBRES_ICONOS_ACTIVIDAD, type NombreIconoActividad } from './iconosActividad';
 import type { BloqueHorario, DiaSemana, Materia } from '@/types/models';
 
 const PALETA_COLORES = [
   '#2c4a9e', '#2f8f5b', '#b1791a', '#8b3ba0', '#c0392b', '#1a8b8b',
 ];
 
+const SIN_ICONO = '__ninguno__';
+
 const esquemaFormulario = z
   .object({
-    materiaId: z.string().min(1, 'Elegí una materia'),
+    modo: z.enum(['materia', 'actividad']),
+    materiaId: z.string(),
+    titulo: z.string(),
+    icono: z.string(),
     dia: z.enum(['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']),
     horaInicio: z.string().min(1, 'Requerido'),
     horaFin: z.string().min(1, 'Requerido'),
     aula: z.string(),
     color: z.string(),
   })
-  .refine((v) => textoAMinutos(v.horaFin) > textoAMinutos(v.horaInicio), {
-    message: 'Debe ser posterior a la hora de inicio',
-    path: ['horaFin'],
+  .superRefine((v, ctx) => {
+    if (v.modo === 'materia' && v.materiaId.trim() === '') {
+      ctx.addIssue({ code: 'custom', path: ['materiaId'], message: 'Elegí una materia' });
+    }
+    if (v.modo === 'actividad' && v.titulo.trim() === '') {
+      ctx.addIssue({ code: 'custom', path: ['titulo'], message: 'Ingresá un nombre' });
+    }
+    if (textoAMinutos(v.horaFin) <= textoAMinutos(v.horaInicio)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['horaFin'],
+        message: 'Debe ser posterior a la hora de inicio',
+      });
+    }
   });
 
 type ValoresFormulario = z.infer<typeof esquemaFormulario>;
@@ -59,7 +78,10 @@ function valoresPorDefecto(
   if (!bloque) {
     const inicio = horaInicioPorDefecto ?? 8 * 60;
     return {
+      modo: 'materia',
       materiaId: '',
+      titulo: '',
+      icono: SIN_ICONO,
       dia: diaPorDefecto ?? 'lunes',
       horaInicio: minutosATexto(inicio),
       horaFin: minutosATexto(inicio + 90),
@@ -68,7 +90,10 @@ function valoresPorDefecto(
     };
   }
   return {
-    materiaId: bloque.materiaId,
+    modo: bloque.materiaId ? 'materia' : 'actividad',
+    materiaId: bloque.materiaId ?? '',
+    titulo: bloque.titulo ?? '',
+    icono: bloque.icono ?? SIN_ICONO,
     dia: bloque.dia,
     horaInicio: minutosATexto(bloque.horaInicioMin),
     horaFin: minutosATexto(bloque.horaFinMin),
@@ -105,9 +130,13 @@ export function BloqueForm({
     if (open) form.reset(valoresPorDefecto(bloque, diaPorDefecto, horaInicioPorDefecto));
   }, [open, bloque, diaPorDefecto, horaInicioPorDefecto, form]);
 
+  const modo = form.watch('modo');
+
   async function onSubmit(valores: ValoresFormulario) {
     const datos = {
-      materiaId: valores.materiaId,
+      materiaId: valores.modo === 'materia' ? valores.materiaId : null,
+      titulo: valores.modo === 'actividad' ? valores.titulo.trim() : null,
+      icono: valores.icono === SIN_ICONO ? null : valores.icono,
       dia: valores.dia,
       horaInicioMin: textoAMinutos(valores.horaInicio),
       horaFinMin: textoAMinutos(valores.horaFin),
@@ -125,7 +154,7 @@ export function BloqueForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{bloque ? 'Editar bloque' : 'Nuevo bloque de horario'}</DialogTitle>
           <DialogDescription>
@@ -138,25 +167,128 @@ export function BloqueForm({
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <FormField
               control={form.control}
-              name="materiaId"
+              name="modo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Materia</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <FormLabel>¿Qué es este bloque?</FormLabel>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => field.onChange('materia')}
+                      className={cn(
+                        'rounded-md border px-3 py-1.5 text-sm',
+                        field.value === 'materia'
+                          ? 'border-primary bg-accent text-accent-foreground'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      Una materia
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.onChange('actividad')}
+                      className={cn(
+                        'rounded-md border px-3 py-1.5 text-sm',
+                        field.value === 'actividad'
+                          ? 'border-primary bg-accent text-accent-foreground'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      Otra actividad
+                    </button>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {modo === 'materia' ? (
+              <FormField
+                control={form.control}
+                name="materiaId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Materia</FormLabel>
+                    {materias.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No tenés materias cargadas todavía — creá una desde Académico, o elegí
+                        "Otra actividad" arriba.
+                      </p>
+                    ) : (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Elegí una materia" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {materias.map((m) => (
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.nombre}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <FormField
+                control={form.control}
+                name="titulo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de la actividad</FormLabel>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Elegí una materia" />
-                      </SelectTrigger>
+                      <Input placeholder="Gimnasio" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      {materias.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            <FormField
+              control={form.control}
+              name="icono"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ícono (opcional)</FormLabel>
+                  <div className="grid grid-cols-9 gap-1.5 rounded-md border p-2">
+                    <button
+                      type="button"
+                      title="Sin ícono"
+                      onClick={() => field.onChange(SIN_ICONO)}
+                      className={cn(
+                        'flex size-8 items-center justify-center rounded-md border text-muted-foreground',
+                        field.value === SIN_ICONO
+                          ? 'border-primary bg-accent'
+                          : 'border-transparent hover:bg-muted',
+                      )}
+                    >
+                      <Ban className="size-4" />
+                    </button>
+                    {NOMBRES_ICONOS_ACTIVIDAD.map((nombre) => {
+                      const Icono = ICONOS_ACTIVIDAD[nombre as NombreIconoActividad];
+                      return (
+                        <button
+                          key={nombre}
+                          type="button"
+                          title={nombre}
+                          onClick={() => field.onChange(nombre)}
+                          className={cn(
+                            'flex size-8 items-center justify-center rounded-md border',
+                            field.value === nombre
+                              ? 'border-primary bg-accent'
+                              : 'border-transparent hover:bg-muted',
+                          )}
+                        >
+                          <Icono className="size-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </FormItem>
               )}
             />
@@ -221,7 +353,7 @@ export function BloqueForm({
                 name="aula"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Aula (opcional)</FormLabel>
+                    <FormLabel>Lugar (opcional)</FormLabel>
                     <FormControl>
                       <Input placeholder="Aula 12" {...field} />
                     </FormControl>

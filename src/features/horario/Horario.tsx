@@ -41,15 +41,6 @@ export function Horario() {
     setFormAbierto(true);
   }
 
-  if (materias.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-24 text-center text-muted-foreground">
-        <p className="text-base font-medium text-foreground">Todavía no cargaste materias</p>
-        <p className="text-sm">Un bloque de horario necesita estar asociado a una materia.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div>

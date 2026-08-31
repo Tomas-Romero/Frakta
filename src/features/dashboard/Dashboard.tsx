@@ -64,7 +64,10 @@ export function Dashboard() {
 
   const ahora = new Date();
   const proxima = proximaClase(bloques, ahora);
-  const materiaProxima = proxima ? materias.find((m) => m.id === proxima.bloque.materiaId) : null;
+  const materiaProxima = proxima?.bloque.materiaId
+    ? materias.find((m) => m.id === proxima.bloque.materiaId)
+    : null;
+  const tituloProxima = materiaProxima?.nombre ?? proxima?.bloque.titulo ?? null;
 
   const limite48h = addHours(ahora, 48);
   const tareasPorVencer = tareas
@@ -82,13 +85,13 @@ export function Dashboard() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Widget titulo="Próxima clase" icono={CalendarClock} color="bg-brand-green/15 text-brand-green" vista="horario">
-        {proxima && materiaProxima ? (
+        {proxima && tituloProxima ? (
           <>
-            <p className="font-medium">{materiaProxima.nombre}</p>
+            <p className="font-medium">{tituloProxima}</p>
             <CardDescription>{proxima.cuando}</CardDescription>
           </>
         ) : (
-          <CardDescription>No hay clases cargadas.</CardDescription>
+          <CardDescription>No hay nada cargado en el horario.</CardDescription>
         )}
       </Widget>
 

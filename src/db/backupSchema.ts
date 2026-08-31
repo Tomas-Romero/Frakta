@@ -32,7 +32,9 @@ const diaSemanaSchema = z.enum([
 
 const bloqueHorarioSchema = z.object({
   id: z.string(),
-  materiaId: z.string(),
+  materiaId: z.string().nullable(),
+  titulo: z.string().nullable().default(null),
+  icono: z.string().nullable().default(null),
   dia: diaSemanaSchema,
   horaInicioMin: z.number().min(0).max(1440),
   horaFinMin: z.number().min(0).max(1440),
@@ -124,6 +126,8 @@ export const backupCompletoSchema = z.object({
   config: z.object({
     tema: z.enum(['auto', 'claro', 'oscuro']),
     escalaNotas: z.enum(['1-10', '0-100']),
+    recordatoriosActivos: z.boolean().default(true),
+    almacenamientoPersistenteActivo: z.boolean().default(true),
   }),
 });
 
