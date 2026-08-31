@@ -1,0 +1,479 @@
+{
+  "app": "organizador-local-first",
+  "schemaVersion": 2,
+  "exportadoEn": "2026-08-28T12:00:00.000Z",
+  "datos": {
+    "materias": [
+      {
+        "id": "materia-analisis-1",
+        "nombre": "Análisis Matemático I",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 6, "total": 96 },
+        "estado": "Aprobado",
+        "nota": 8.5,
+        "parciales": [
+          { "nombre": "Primer parcial", "nota": 9, "peso": 0.3 },
+          { "nombre": "Segundo parcial", "nota": 8, "peso": 0.3 }
+        ],
+        "pesoFinal": 0.4,
+        "correlativas": [],
+        "creadoEn": "2026-03-02T12:00:00.000Z",
+        "actualizadoEn": "2026-07-10T12:00:00.000Z"
+      },
+      {
+        "id": "materia-algebra",
+        "nombre": "Álgebra",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 4, "total": 64 },
+        "estado": "Aprobado",
+        "nota": 7,
+        "parciales": [
+          { "nombre": "Primer parcial", "nota": 7, "peso": 0.3 },
+          { "nombre": "Segundo parcial", "nota": 7, "peso": 0.3 }
+        ],
+        "pesoFinal": 0.4,
+        "correlativas": [],
+        "creadoEn": "2026-03-02T12:00:00.000Z",
+        "actualizadoEn": "2026-07-12T12:00:00.000Z"
+      },
+      {
+        "id": "materia-fisica-1",
+        "nombre": "Física I",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 6, "total": 90 },
+        "estado": "Cursando",
+        "nota": null,
+        "parciales": [
+          { "nombre": "Primer parcial", "nota": 6, "peso": 0.3 },
+          { "nombre": "Segundo parcial", "nota": null, "peso": 0.3 }
+        ],
+        "pesoFinal": 0.4,
+        "correlativas": ["materia-analisis-1", "materia-algebra"],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-20T12:00:00.000Z"
+      },
+      {
+        "id": "materia-quimica",
+        "nombre": "Química General",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 4, "total": 60 },
+        "estado": "Regular",
+        "nota": null,
+        "parciales": [
+          { "nombre": "Parcial único", "nota": 5, "peso": 0.6 }
+        ],
+        "pesoFinal": 0.4,
+        "correlativas": [],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-15T12:00:00.000Z"
+      },
+      {
+        "id": "materia-programacion-1",
+        "nombre": "Programación I",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 6, "total": 96 },
+        "estado": "Aprobado",
+        "nota": 9,
+        "parciales": [
+          { "nombre": "Primer parcial", "nota": 9, "peso": 0.5 },
+          { "nombre": "Segundo parcial", "nota": 9, "peso": 0.4 }
+        ],
+        "pesoFinal": 0.1,
+        "correlativas": [],
+        "creadoEn": "2026-03-02T12:00:00.000Z",
+        "actualizadoEn": "2026-07-05T12:00:00.000Z"
+      },
+      {
+        "id": "materia-ingles-tecnico",
+        "nombre": "Inglés Técnico",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 2, "total": 32 },
+        "estado": "Aprobado",
+        "nota": 6,
+        "parciales": [
+          { "nombre": "Parcial único", "nota": 6, "peso": 0.5 }
+        ],
+        "pesoFinal": 0.5,
+        "correlativas": [],
+        "creadoEn": "2026-03-02T12:00:00.000Z",
+        "actualizadoEn": "2026-06-20T12:00:00.000Z"
+      },
+      {
+        "id": "materia-taller-redaccion",
+        "nombre": "Taller de Redacción",
+        "anioCursado": 1,
+        "cargaHoraria": { "semanal": 2, "total": 32 },
+        "estado": "Aprobado",
+        "nota": 8,
+        "parciales": [
+          { "nombre": "Trabajo final", "nota": 8, "peso": 1 }
+        ],
+        "pesoFinal": 0,
+        "correlativas": [],
+        "creadoEn": "2026-03-02T12:00:00.000Z",
+        "actualizadoEn": "2026-05-15T12:00:00.000Z"
+      },
+      {
+        "id": "materia-bases-de-datos",
+        "nombre": "Bases de Datos",
+        "anioCursado": 2,
+        "cargaHoraria": { "semanal": 6, "total": 90 },
+        "estado": "Cursando",
+        "nota": null,
+        "parciales": [
+          { "nombre": "Primer parcial", "nota": 3, "peso": 0.5 }
+        ],
+        "pesoFinal": 0.5,
+        "correlativas": ["materia-algebra"],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-25T12:00:00.000Z"
+      },
+      {
+        "id": "materia-analisis-2",
+        "nombre": "Análisis Matemático II",
+        "anioCursado": 2,
+        "cargaHoraria": { "semanal": 6, "total": 96 },
+        "estado": "PorCursar",
+        "nota": null,
+        "parciales": [],
+        "pesoFinal": 1,
+        "correlativas": ["materia-analisis-1"],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-01T12:00:00.000Z"
+      },
+      {
+        "id": "materia-fisica-2",
+        "nombre": "Física II",
+        "anioCursado": 2,
+        "cargaHoraria": { "semanal": 4, "total": 64 },
+        "estado": "PorCursar",
+        "nota": null,
+        "parciales": [],
+        "pesoFinal": 1,
+        "correlativas": ["materia-fisica-1"],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-01T12:00:00.000Z"
+      },
+      {
+        "id": "materia-sistemas-operativos",
+        "nombre": "Sistemas Operativos",
+        "anioCursado": 2,
+        "cargaHoraria": { "semanal": 4, "total": 64 },
+        "estado": "PorCursar",
+        "nota": null,
+        "parciales": [],
+        "pesoFinal": 1,
+        "correlativas": ["materia-programacion-1"],
+        "creadoEn": "2026-08-01T12:00:00.000Z",
+        "actualizadoEn": "2026-08-01T12:00:00.000Z"
+      }
+    ],
+    "bloquesHorario": [
+      {
+        "id": "bloque-1",
+        "materiaId": "materia-fisica-1",
+        "dia": "lunes",
+        "horaInicioMin": 480,
+        "horaFinMin": 660,
+        "aula": "Aula 12",
+        "color": "#2c4a9e"
+      },
+      {
+        "id": "bloque-2",
+        "materiaId": "materia-quimica",
+        "dia": "lunes",
+        "horaInicioMin": 600,
+        "horaFinMin": 720,
+        "aula": "Laboratorio 3",
+        "color": "#2f8f5b"
+      },
+      {
+        "id": "bloque-3",
+        "materiaId": "materia-bases-de-datos",
+        "dia": "lunes",
+        "horaInicioMin": 1080,
+        "horaFinMin": 1260,
+        "aula": "Aula 5",
+        "color": "#b1791a"
+      },
+      {
+        "id": "bloque-4",
+        "materiaId": "materia-fisica-1",
+        "dia": "miercoles",
+        "horaInicioMin": 480,
+        "horaFinMin": 600,
+        "aula": "Aula 12",
+        "color": "#2c4a9e"
+      },
+      {
+        "id": "bloque-5",
+        "materiaId": "materia-bases-de-datos",
+        "dia": "miercoles",
+        "horaInicioMin": 840,
+        "horaFinMin": 1020,
+        "aula": "Laboratorio 1",
+        "color": "#b1791a"
+      },
+      {
+        "id": "bloque-6",
+        "materiaId": "materia-quimica",
+        "dia": "viernes",
+        "horaInicioMin": 540,
+        "horaFinMin": 720,
+        "aula": "Laboratorio 3",
+        "color": "#2f8f5b"
+      }
+    ],
+    "tareas": [
+      {
+        "id": "tarea-tp-bd",
+        "titulo": "Entregar avance del TP de Bases de Datos",
+        "tipo": "academica",
+        "proyectoId": null,
+        "estado": "en_progreso",
+        "prioridad": "alta",
+        "fechaLimite": "2026-08-29",
+        "materiaId": "materia-bases-de-datos",
+        "pomodorosCompletados": 3
+      },
+      {
+        "id": "tarea-estudiar-fisica",
+        "titulo": "Estudiar para el parcial de Física I",
+        "tipo": "academica",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "alta",
+        "fechaLimite": "2026-08-28",
+        "materiaId": "materia-fisica-1",
+        "pomodorosCompletados": 1
+      },
+      {
+        "id": "tarea-guia-quimica",
+        "titulo": "Terminar la guía de ejercicios de Química",
+        "tipo": "academica",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "media",
+        "fechaLimite": "2026-09-05",
+        "materiaId": "materia-quimica",
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-repaso-bd",
+        "titulo": "Repasar apuntes de Bases de Datos",
+        "tipo": "academica",
+        "proyectoId": null,
+        "estado": "completado",
+        "prioridad": "media",
+        "fechaLimite": "2026-08-22",
+        "materiaId": "materia-bases-de-datos",
+        "pomodorosCompletados": 4
+      },
+      {
+        "id": "tarea-alquiler",
+        "titulo": "Pagar el alquiler",
+        "tipo": "personal",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "alta",
+        "fechaLimite": "2026-08-25",
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-dni",
+        "titulo": "Renovar el DNI",
+        "tipo": "personal",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "baja",
+        "fechaLimite": "2026-10-10",
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-ingredientes-asado",
+        "titulo": "Comprar los ingredientes para el asado",
+        "tipo": "personal",
+        "proyectoId": null,
+        "estado": "completado",
+        "prioridad": "baja",
+        "fechaLimite": "2026-08-27",
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-gimnasio",
+        "titulo": "Ir al gimnasio",
+        "tipo": "personal",
+        "proyectoId": null,
+        "estado": "en_progreso",
+        "prioridad": "baja",
+        "fechaLimite": null,
+        "materiaId": null,
+        "pomodorosCompletados": 2
+      },
+      {
+        "id": "tarea-logo-landing",
+        "titulo": "Diseñar el logo para la landing",
+        "tipo": "proyecto",
+        "proyectoId": "proyecto-freelance-landing",
+        "estado": "en_progreso",
+        "prioridad": "media",
+        "fechaLimite": "2026-09-01",
+        "materiaId": null,
+        "pomodorosCompletados": 5
+      },
+      {
+        "id": "tarea-deploy-landing",
+        "titulo": "Armar el deploy en Vercel",
+        "tipo": "proyecto",
+        "proyectoId": "proyecto-freelance-landing",
+        "estado": "por_hacer",
+        "prioridad": "media",
+        "fechaLimite": null,
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-tests-recetas",
+        "titulo": "Escribir los tests de la app de recetas",
+        "tipo": "proyecto",
+        "proyectoId": "proyecto-app-recetas",
+        "estado": "completado",
+        "prioridad": "media",
+        "fechaLimite": "2026-08-20",
+        "materiaId": null,
+        "pomodorosCompletados": 8
+      },
+      {
+        "id": "tarea-idea-viajes",
+        "titulo": "Idea: app para dividir gastos de viaje",
+        "tipo": "idea",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "baja",
+        "fechaLimite": null,
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      },
+      {
+        "id": "tarea-idea-newsletter",
+        "titulo": "Idea: newsletter semanal de la facultad",
+        "tipo": "idea",
+        "proyectoId": null,
+        "estado": "por_hacer",
+        "prioridad": "baja",
+        "fechaLimite": null,
+        "materiaId": null,
+        "pomodorosCompletados": 0
+      }
+    ],
+    "proyectos": [
+      {
+        "id": "proyecto-freelance-landing",
+        "nombre": "Freelance - Landing page cliente",
+        "descripcion": "Sitio de una página para un emprendimiento de indumentaria."
+      },
+      {
+        "id": "proyecto-app-recetas",
+        "nombre": "App de recetas (personal)",
+        "descripcion": "Proyecto personal para aprender React Native."
+      }
+    ],
+    "movimientos": [
+      { "id": "mov-sueldo-agosto", "tipo": "ingreso", "monto": 850000, "categoria": "Sueldo", "fecha": "2026-08-01", "descripcion": "Sueldo de agosto" },
+      { "id": "mov-freelance-sena", "tipo": "ingreso", "monto": 120000, "categoria": "Freelance", "fecha": "2026-08-15", "descripcion": "Seña landing page cliente" },
+      { "id": "mov-super-1", "tipo": "gasto", "monto": 45000, "categoria": "Alimentación", "fecha": "2026-08-03", "descripcion": "Supermercado semana 1" },
+      { "id": "mov-super-2", "tipo": "gasto", "monto": 38000, "categoria": "Alimentación", "fecha": "2026-08-10", "descripcion": "Supermercado semana 2" },
+      { "id": "mov-verduleria", "tipo": "gasto", "monto": 22000, "categoria": "Alimentación", "fecha": "2026-08-20", "descripcion": "Verdulería y carnicería" },
+      { "id": "mov-sube", "tipo": "gasto", "monto": 15000, "categoria": "Transporte", "fecha": "2026-08-05", "descripcion": "Carga SUBE" },
+      { "id": "mov-nafta", "tipo": "gasto", "monto": 12000, "categoria": "Transporte", "fecha": "2026-08-18", "descripcion": "Nafta" },
+      { "id": "mov-cine", "tipo": "gasto", "monto": 18000, "categoria": "Ocio", "fecha": "2026-08-08", "descripcion": "Cine con amigos" },
+      { "id": "mov-asado", "tipo": "gasto", "monto": 25000, "categoria": "Ocio", "fecha": "2026-08-22", "descripcion": "Aporte para el asado del sábado" },
+      { "id": "mov-netflix", "tipo": "gasto", "monto": 8500, "categoria": "Servicios", "fecha": "2026-08-12", "descripcion": "Netflix" },
+      { "id": "mov-spotify", "tipo": "gasto", "monto": 4200, "categoria": "Servicios", "fecha": "2026-08-12", "descripcion": "Spotify" },
+      { "id": "mov-internet", "tipo": "gasto", "monto": 35000, "categoria": "Servicios", "fecha": "2026-08-15", "descripcion": "Internet y cable" },
+      { "id": "mov-sueldo-julio", "tipo": "ingreso", "monto": 820000, "categoria": "Sueldo", "fecha": "2026-07-01", "descripcion": "Sueldo de julio" },
+      { "id": "mov-super-julio", "tipo": "gasto", "monto": 60000, "categoria": "Alimentación", "fecha": "2026-07-10", "descripcion": "Supermercado del mes" },
+      { "id": "mov-recital-julio", "tipo": "gasto", "monto": 30000, "categoria": "Ocio", "fecha": "2026-07-20", "descripcion": "Recital" }
+    ],
+    "suscripciones": [
+      { "id": "susc-netflix", "nombre": "Netflix", "monto": 8500, "diaDelMes": 12, "categoria": "Servicios", "activa": true },
+      { "id": "susc-spotify", "nombre": "Spotify", "monto": 4200, "diaDelMes": 12, "categoria": "Servicios", "activa": true },
+      { "id": "susc-internet", "nombre": "Internet y Cable", "monto": 35000, "diaDelMes": 15, "categoria": "Servicios", "activa": true },
+      { "id": "susc-gimnasio", "nombre": "Gimnasio", "monto": 22000, "diaDelMes": 5, "categoria": "Ocio", "activa": true },
+      { "id": "susc-seguro-auto", "nombre": "Seguro del auto", "monto": 40000, "diaDelMes": 31, "categoria": "Transporte", "activa": true },
+      { "id": "susc-revista", "nombre": "Revista (cancelada)", "monto": 3000, "diaDelMes": 20, "categoria": "Ocio", "activa": false }
+    ],
+    "presupuestos": [
+      { "categoria": "Alimentación", "montoMensual": 90000 },
+      { "categoria": "Transporte", "montoMensual": 30000 },
+      { "categoria": "Ocio", "montoMensual": 30000 },
+      { "categoria": "Servicios", "montoMensual": 50000 }
+    ],
+    "eventosCompartidos": [
+      {
+        "id": "evento-asado",
+        "nombre": "Asado del sábado",
+        "participantes": [
+          { "id": "p-pablo", "nombre": "Pablo" },
+          { "id": "p-tomas", "nombre": "Tomás" },
+          { "id": "p-sofia", "nombre": "Sofía" },
+          { "id": "p-lucia", "nombre": "Lucía" }
+        ],
+        "gastos": [
+          {
+            "id": "gasto-carne",
+            "descripcion": "Carne y verdura",
+            "monto": 32000,
+            "pagadoPor": ["p-pablo"],
+            "participantes": ["p-pablo", "p-tomas", "p-sofia", "p-lucia"]
+          },
+          {
+            "id": "gasto-bebidas",
+            "descripcion": "Bebidas",
+            "monto": 15000,
+            "pagadoPor": ["p-tomas"],
+            "participantes": ["p-pablo", "p-tomas", "p-lucia"]
+          },
+          {
+            "id": "gasto-hielo",
+            "descripcion": "Hielo y carbón",
+            "monto": 6000,
+            "pagadoPor": ["p-sofia"],
+            "participantes": ["p-pablo", "p-tomas", "p-sofia", "p-lucia"]
+          }
+        ]
+      },
+      {
+        "id": "evento-viaje-costa",
+        "nombre": "Viaje a la costa",
+        "participantes": [
+          { "id": "p-nico", "nombre": "Nico" },
+          { "id": "p-caro", "nombre": "Caro" }
+        ],
+        "gastos": [
+          {
+            "id": "gasto-nafta-viaje",
+            "descripcion": "Nafta ida y vuelta",
+            "monto": 20000,
+            "pagadoPor": ["p-nico"],
+            "participantes": ["p-nico", "p-caro"]
+          },
+          {
+            "id": "gasto-peaje-viaje",
+            "descripcion": "Peajes y estacionamiento",
+            "monto": 20000,
+            "pagadoPor": ["p-caro"],
+            "participantes": ["p-nico", "p-caro"]
+          }
+        ]
+      }
+    ]
+  },
+  "config": {
+    "tema": "auto",
+    "escalaNotas": "1-10"
+  }
+}
