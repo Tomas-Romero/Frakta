@@ -50,4 +50,4 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 
 ---
 
-**Estado actual: las 6 fases completas. Ver "Estado actual" en `CLAUDE.md` para el detalle de qué se hizo en cada una.**
+**Estado actual: las 6 fases completas.**

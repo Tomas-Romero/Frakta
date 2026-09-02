@@ -2,8 +2,7 @@ import type { ConfigApp } from '@/db/db';
 
 // `localStorage` es solo caché para pintar el tema correcto antes de que
 // Dexie resuelva (evita el flash) — la fuente de verdad sigue siendo
-// `ConfigApp.tema` en Dexie, que viaja en el backup. Ver CLAUDE.md
-// "Convenciones del proyecto".
+// `ConfigApp.tema` en Dexie, que viaja en el backup.
 export const TEMA_CACHE_KEY = 'frakta-tema';
 
 type Tema = ConfigApp['tema'];

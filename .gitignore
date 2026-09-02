@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AI tooling
+.claude/
+CLAUDE.md
+AGENTS.md

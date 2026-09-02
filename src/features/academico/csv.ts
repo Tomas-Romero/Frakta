@@ -4,7 +4,7 @@ import { db } from '../../db/db';
 import { parseNumeroAr, formatNumeroAr } from '../../lib/numeroAr';
 import type { EstadoMateria, Materia } from '../../types/models';
 
-// Formato Argentina: `;` como delimitador de CSV. Ver CLAUDE.md "Convenciones del proyecto".
+// Formato Argentina: `;` como delimitador de CSV.
 
 export const ENCABEZADOS_CSV = [
   'Materia',

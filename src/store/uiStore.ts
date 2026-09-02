@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { necesitaRecordatorioBackup, registrarBackupExportado } from '@/lib/backupRecordatorio';
 
 // Estado de UI únicamente (pestaña activa, colapso de sidebar). Ningún dato
-// de negocio vive acá — eso es Dexie. Ver CLAUDE.md "Convenciones del proyecto".
+// de negocio vive acá — eso es Dexie.
 
 export type Vista =
   | 'dashboard'

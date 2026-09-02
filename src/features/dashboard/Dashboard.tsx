@@ -19,7 +19,7 @@ import { parseISO, isBefore, addHours } from 'date-fns';
 
 // El Dashboard es siempre de solo lectura: cada widget resume su módulo y
 // lleva a él, nunca trae formularios de edición propios.
-// Ver CLAUDE.md "Convenciones del proyecto" y BLUEPRINT.md sección 1.
+// Ver BLUEPRINT.md sección 1.
 
 interface WidgetProps {
   titulo: string;
