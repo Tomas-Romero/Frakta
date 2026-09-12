@@ -109,6 +109,56 @@ const eventoCompartidoSchema = z.object({
   gastos: z.array(gastoItemSchema),
 });
 
+const ejercicioPlanificadoSchema = z.object({
+  nombre: z.string(),
+  seriesObjetivo: z.number().int().min(0),
+  repeticionesObjetivo: z.number().int().min(0),
+});
+
+const diaRutinaSchema = z.object({
+  dia: diaSemanaSchema,
+  foco: z.string(),
+  ejercicios: z.array(ejercicioPlanificadoSchema),
+});
+
+const rutinaSchema = z.object({
+  id: z.string(),
+  nombre: z.string(),
+  dias: z.array(diaRutinaSchema),
+  activa: z.boolean(),
+  creadoEn: z.string(),
+  actualizadoEn: z.string(),
+});
+
+const tipoRegistroEjercicioSchema = z.enum(['fuerza', 'triserie_core', 'cardio']);
+
+const ejercicioTriserieSchema = z.object({
+  nombre: z.string(),
+  series: z.number().int().min(0),
+  repeticiones: z.number().int().min(0),
+});
+
+const registroEjercicioSchema = z.object({
+  id: z.string(),
+  fecha: z.string(),
+  tipo: tipoRegistroEjercicioSchema,
+  nombreEjercicio: z.string().nullable(),
+  series: z.number().int().min(0).nullable(),
+  repeticiones: z.number().int().min(0).nullable(),
+  pesoKg: z.number().min(0).nullable(),
+  ejerciciosTriserie: z.array(ejercicioTriserieSchema).nullable(),
+  duracionMin: z.number().min(0).nullable(),
+  distanciaKm: z.number().min(0).nullable(),
+  notas: z.string().nullable(),
+});
+
+const registroNutricionSchema = z.object({
+  fecha: z.string(),
+  proteinaObjetivoG: z.number().min(0),
+  proteinaLogradaG: z.number().min(0),
+  creatinaTomada: z.boolean(),
+});
+
 export const backupCompletoSchema = z.object({
   app: z.literal('organizador-local-first'),
   schemaVersion: z.number().int().positive(),
@@ -122,6 +172,9 @@ export const backupCompletoSchema = z.object({
     suscripciones: z.array(suscripcionRecurrenteSchema),
     presupuestos: z.array(presupuestoSchema),
     eventosCompartidos: z.array(eventoCompartidoSchema),
+    rutinas: z.array(rutinaSchema).default([]),
+    registrosEjercicio: z.array(registroEjercicioSchema).default([]),
+    registrosNutricion: z.array(registroNutricionSchema).default([]),
   }),
   config: z.object({
     tema: z.enum(['auto', 'claro', 'oscuro']),

@@ -48,6 +48,13 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 - [x] `navigator.storage.persist()` solicitado al usuario
 - [x] Instructivo de importación visible desde el módulo Académico
 
+## Fase 7 — Hábitos y Entrenamiento
+
+- [x] Rutina de split (5 días activos + descanso) con ejercicios planificados por día
+- [x] Registro de sesiones: fuerza (series/reps/peso), triserie de core, cardio (tiempo/distancia)
+- [x] Tracking nutricional diario: proteína objetivo/lograda y checkbox de creatina
+- [x] `SCHEMA_VERSION_ACTUAL` v2→v3 con migración de backup correspondiente
+
 ---
 
-**Estado actual: las 6 fases completas.**
+**Estado actual: 7 fases completas.**

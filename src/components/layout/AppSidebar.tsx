@@ -4,6 +4,7 @@ import {
   GraduationCap,
   Wallet,
   Users,
+  Dumbbell,
   Settings,
 } from 'lucide-react';
 import {
@@ -28,6 +29,7 @@ const MODULOS_CONTENIDO: { vista: Vista; etiqueta: string; icono: typeof ListTod
   { vista: 'academico', etiqueta: 'Académico', icono: GraduationCap },
   { vista: 'finanzas', etiqueta: 'Finanzas', icono: Wallet },
   { vista: 'gastos-compartidos', etiqueta: 'Gastos Compartidos', icono: Users },
+  { vista: 'habitos', etiqueta: 'Hábitos', icono: Dumbbell },
 ];
 
 export function AppSidebar() {

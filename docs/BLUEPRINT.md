@@ -202,6 +202,7 @@ Los tipos completos ya están escritos en [`src/types/models.ts`](../src/types/m
 - **Tarea / Proyecto**: tipo (`academica | personal | proyecto | idea`), estado Kanban, prioridad, fecha límite, `pomodorosCompletados`.
 - **MovimientoFinanciero / SuscripcionRecurrente**: monto, categoría, fecha o día del mes fijo para recurrentes.
 - **EventoCompartido**: `participantes` + `gastos`, cada gasto con su propia lista de participantes (ver sección 2.3).
+- **Rutina / RegistroEjercicio / RegistroNutricion**: módulo de Hábitos y Entrenamiento, ver sección 6.
 - **BackupCompleto**: el objeto que viaja en el JSON de exportación. Lleva `schemaVersion` — campo no negociable. Cada importación corre primero por una función `migrarBackup(json)` que mira `schemaVersion` y aplica transformaciones incrementales (v1→v2, v2→v3…) antes de tocar la base local, y luego por validación Zod antes de escribir una sola fila. Un archivo que falla la validación se rechaza entero, nunca se mezcla parcialmente con los datos existentes.
 
 ---
@@ -249,7 +250,21 @@ Si el resultado supera la escala máxima, avisar que ya no es matemáticamente p
 
 ---
 
-## 6. Riesgos y consideraciones finales
+## 6. Módulo de Hábitos y Entrenamiento
+
+Plan de entrenamiento (rutina de split), registro de sesiones y seguimiento nutricional diario. `SCHEMA_VERSION_ACTUAL` pasó de 2 a 3 para las tres tablas nuevas (`rutinas`, `registrosEjercicio`, `registrosNutricion`), con la migración v2→v3 correspondiente en `migrarBackup()`.
+
+### 6.1 — Un tipo, campos por rama, no tres tablas
+
+`RegistroEjercicio` cubre tres cosas muy distintas (una serie de fuerza, una triserie de core, una sesión de cardio) con un único `tipo: 'fuerza' | 'triserie_core' | 'cardio'` y campos nullable por rama — el mismo patrón que ya usa `BloqueHorario` para distinguir una materia de una actividad libre (ver sección 2.2). La alternativa — tres tablas separadas, o una fila por ejercicio de la triserie con un `bloqueId` sintético compartido — obligaría a reagrupar filas en cada lectura sin ganar nada a cambio. La validación de "qué campos son obligatorios según el tipo" vive en el formulario (`.superRefine()`), no en el modelo ni en el esquema de backup.
+
+### 6.2 — Nutrición diaria: fecha como clave primaria, upsert transaccional
+
+`RegistroNutricion` es una fila por día con `fecha` (ISO) como clave primaria — igual que `Presupuesto` usa `categoria`, sin id sintético. El checkbox de creatina y los gramos de proteína se editan de forma independiente en la UI, así que un simple `get` + `put` corre el mismo riesgo de pisarse que tenía `actualizarConfig()` (ver más abajo): `actualizarRegistroNutricion()` reutiliza textualmente ese patrón — lectura y escritura dentro de una única `db.transaction('rw', ...)` — para que dos cambios casi simultáneos nunca se pisen entre sí.
+
+---
+
+## 7. Riesgos y consideraciones finales
 
 - **Pérdida de datos.** El recordatorio de backup (sección 1) es la mitigación de base. Como mejora opcional, la File System Access API (Chrome/Edge) permite auto-export periódico a una carpeta elegida por el usuario — mencionarlo como mejora, no como base: Safari y Firefox no la soportan.
 - **Migraciones de esquema.** Versionar desde la Fase 0 (ver `ROADMAP.md`) no es previsión excesiva: es lo que evita que un cambio de forma más adelante rompa un backup exportado antes.

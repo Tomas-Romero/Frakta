@@ -12,6 +12,7 @@ export type Vista =
   | 'academico'
   | 'finanzas'
   | 'gastos-compartidos'
+  | 'habitos'
   | 'ajustes';
 
 interface UiState {

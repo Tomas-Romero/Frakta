@@ -8,9 +8,12 @@ import type {
   SuscripcionRecurrente,
   Presupuesto,
   EventoCompartido,
+  Rutina,
+  RegistroEjercicio,
+  RegistroNutricion,
 } from '../types/models';
 
-export const SCHEMA_VERSION_ACTUAL = 2;
+export const SCHEMA_VERSION_ACTUAL = 3;
 
 export interface ConfigApp {
   id: 'app';
@@ -29,6 +32,9 @@ export class OrganizadorDB extends Dexie {
   suscripciones!: EntityTable<SuscripcionRecurrente, 'id'>;
   presupuestos!: EntityTable<Presupuesto, 'categoria'>;
   eventosCompartidos!: EntityTable<EventoCompartido, 'id'>;
+  rutinas!: EntityTable<Rutina, 'id'>;
+  registrosEjercicio!: EntityTable<RegistroEjercicio, 'id'>;
+  registrosNutricion!: EntityTable<RegistroNutricion, 'fecha'>;
   config!: EntityTable<ConfigApp, 'id'>;
 
   constructor() {
@@ -46,8 +52,15 @@ export class OrganizadorDB extends Dexie {
     });
 
     // v2: agrega presupuestos por categoría (BLUEPRINT.md sección 5 — Fase 3).
-    this.version(SCHEMA_VERSION_ACTUAL).stores({
+    this.version(2).stores({
       presupuestos: 'categoria',
+    });
+
+    // v3: agrega el módulo de Hábitos y Entrenamiento (BLUEPRINT.md sección 7).
+    this.version(SCHEMA_VERSION_ACTUAL).stores({
+      rutinas: 'id, activa',
+      registrosEjercicio: 'id, fecha, tipo',
+      registrosNutricion: 'fecha',
     });
   }
 }

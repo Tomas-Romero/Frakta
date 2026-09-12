@@ -11,6 +11,7 @@ import { Horario } from '@/features/horario/Horario';
 import { Academico } from '@/features/academico/Academico';
 import { Finanzas } from '@/features/finanzas/Finanzas';
 import { GastosCompartidos } from '@/features/gastos-compartidos/GastosCompartidos';
+import { Habitos } from '@/features/habitos/Habitos';
 import { AjustesBackup } from '@/features/ajustes/AjustesBackup';
 
 const TITULOS: Record<string, string> = {
@@ -20,6 +21,7 @@ const TITULOS: Record<string, string> = {
   academico: 'Académico',
   finanzas: 'Finanzas',
   'gastos-compartidos': 'Gastos Compartidos',
+  habitos: 'Hábitos',
   ajustes: 'Ajustes & Backup',
 };
 
@@ -68,6 +70,8 @@ function VistaActual({ vista }: { vista: string }) {
       return <Finanzas />;
     case 'gastos-compartidos':
       return <GastosCompartidos />;
+    case 'habitos':
+      return <Habitos />;
     case 'ajustes':
       return <AjustesBackup />;
     default:

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   CalendarClock,
+  Dumbbell,
   GraduationCap,
   LayoutDashboard,
   ListTodo,
@@ -23,6 +24,7 @@ const MODULOS_EN_MAS: { vista: Vista; etiqueta: string; icono: typeof LayoutDash
   { vista: 'academico', etiqueta: 'Académico', icono: GraduationCap },
   { vista: 'finanzas', etiqueta: 'Finanzas', icono: Wallet },
   { vista: 'gastos-compartidos', etiqueta: 'Gastos Compartidos', icono: Users },
+  { vista: 'habitos', etiqueta: 'Hábitos', icono: Dumbbell },
   { vista: 'ajustes', etiqueta: 'Ajustes & Backup', icono: Settings },
 ];
 

@@ -12,6 +12,19 @@ const migraciones: Record<number, (json: unknown) => unknown> = {
     const j = json as { datos?: Record<string, unknown> };
     return { ...j, datos: { ...j.datos, presupuestos: j.datos?.presupuestos ?? [] } };
   },
+  // v2 no tenía el módulo de Hábitos y Entrenamiento (agregado en Fase 7).
+  2: (json) => {
+    const j = json as { datos?: Record<string, unknown> };
+    return {
+      ...j,
+      datos: {
+        ...j.datos,
+        rutinas: j.datos?.rutinas ?? [],
+        registrosEjercicio: j.datos?.registrosEjercicio ?? [],
+        registrosNutricion: j.datos?.registrosNutricion ?? [],
+      },
+    };
+  },
 };
 
 /**
@@ -57,6 +70,9 @@ export async function generarBackup(): Promise<BackupCompleto> {
     suscripciones,
     presupuestos,
     eventosCompartidos,
+    rutinas,
+    registrosEjercicio,
+    registrosNutricion,
     config,
   ] = await Promise.all([
     db.materias.toArray(),
@@ -67,6 +83,9 @@ export async function generarBackup(): Promise<BackupCompleto> {
     db.suscripciones.toArray(),
     db.presupuestos.toArray(),
     db.eventosCompartidos.toArray(),
+    db.rutinas.toArray(),
+    db.registrosEjercicio.toArray(),
+    db.registrosNutricion.toArray(),
     obtenerConfig(),
   ]);
 
@@ -83,6 +102,9 @@ export async function generarBackup(): Promise<BackupCompleto> {
       suscripciones,
       presupuestos,
       eventosCompartidos,
+      rutinas,
+      registrosEjercicio,
+      registrosNutricion,
     },
     config: {
       tema: config.tema,
@@ -131,6 +153,9 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
       db.suscripciones,
       db.presupuestos,
       db.eventosCompartidos,
+      db.rutinas,
+      db.registrosEjercicio,
+      db.registrosNutricion,
       db.config,
     ],
     async () => {
@@ -143,6 +168,9 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.suscripciones.clear(),
         db.presupuestos.clear(),
         db.eventosCompartidos.clear(),
+        db.rutinas.clear(),
+        db.registrosEjercicio.clear(),
+        db.registrosNutricion.clear(),
         db.config.clear(),
       ]);
 
@@ -155,6 +183,9 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.suscripciones.bulkAdd(backup.datos.suscripciones),
         db.presupuestos.bulkAdd(backup.datos.presupuestos),
         db.eventosCompartidos.bulkAdd(backup.datos.eventosCompartidos),
+        db.rutinas.bulkAdd(backup.datos.rutinas),
+        db.registrosEjercicio.bulkAdd(backup.datos.registrosEjercicio),
+        db.registrosNutricion.bulkAdd(backup.datos.registrosNutricion),
         db.config.add({ id: 'app', ...backup.config }),
       ]);
     },

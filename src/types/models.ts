@@ -129,6 +129,65 @@ export interface Transferencia {
   monto: number;
 }
 
+// ---------- Hábitos y entrenamiento ----------
+// RegistroEjercicio usa el mismo patrón "un tipo, campos nullable por rama"
+// que BloqueHorario (materiaId/titulo) — nunca tres tablas separadas ni una
+// fila por ejercicio de la triserie con un id sintético compartido.
+
+export interface EjercicioPlanificado {
+  nombre: string;
+  seriesObjetivo: number;
+  repeticionesObjetivo: number;
+}
+
+export interface DiaRutina {
+  dia: DiaSemana;
+  foco: string; // ej. "Pecho y tríceps", "Descanso"
+  ejercicios: EjercicioPlanificado[];
+}
+
+export interface Rutina {
+  id: string;
+  nombre: string;
+  dias: DiaRutina[]; // longitud 7, mismo orden que DIAS de layoutSemana.ts
+  activa: boolean;
+  creadoEn: string;
+  actualizadoEn: string;
+}
+
+export type TipoRegistroEjercicio = 'fuerza' | 'triserie_core' | 'cardio';
+
+export interface EjercicioTriserie {
+  nombre: string;
+  series: number;
+  repeticiones: number;
+}
+
+export interface RegistroEjercicio {
+  id: string;
+  fecha: string; // ISO date (YYYY-MM-DD)
+  tipo: TipoRegistroEjercicio;
+  // tipo === 'fuerza'
+  nombreEjercicio: string | null;
+  series: number | null;
+  repeticiones: number | null;
+  pesoKg: number | null;
+  // tipo === 'triserie_core' — siempre 3 ejercicios
+  ejerciciosTriserie: EjercicioTriserie[] | null;
+  // tipo === 'cardio'
+  duracionMin: number | null;
+  distanciaKm: number | null;
+  notas: string | null;
+}
+
+/** Un registro por día (fecha es la clave primaria, igual que Presupuesto/categoria). */
+export interface RegistroNutricion {
+  fecha: string; // ISO date (YYYY-MM-DD)
+  proteinaObjetivoG: number;
+  proteinaLogradaG: number;
+  creatinaTomada: boolean;
+}
+
 // ---------- Respaldo global (import/export) ----------
 
 export interface BackupCompleto {
@@ -144,6 +203,9 @@ export interface BackupCompleto {
     suscripciones: SuscripcionRecurrente[];
     presupuestos: Presupuesto[];
     eventosCompartidos: EventoCompartido[];
+    rutinas: Rutina[];
+    registrosEjercicio: RegistroEjercicio[];
+    registrosNutricion: RegistroNutricion[];
   };
   config: {
     tema: 'auto' | 'claro' | 'oscuro';
