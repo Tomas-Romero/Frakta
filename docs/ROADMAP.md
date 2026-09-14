@@ -68,6 +68,13 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 - [x] Eje `paleta` independiente de `tema` — cero bump de schema, cero flash al cargar
 - [x] Selector de paleta en Ajustes, isotipo de marca fijo en las 4 opciones
 
+## Fase 10 — Optimización mobile-first extrema
+
+- [x] Touch targets ≥44×44px en Button/Input/Checkbox/Switch, arreglo sistémico en los componentes base
+- [x] Horario: FAB de creación en mobile en vez de tap-en-celda; tap directo intacto en desktop
+- [x] `ResponsiveDialog` (Dialog en desktop, Bottom Sheet en mobile) migrado a los ~15 formularios existentes
+- [x] Safe-area (`env(safe-area-inset-bottom)`) en la bottom nav, el contenido principal y los elementos flotantes
+
 ---
 
-**Estado actual: 9 fases completas.**
+**Estado actual: 10 fases completas.**

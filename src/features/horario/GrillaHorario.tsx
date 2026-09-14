@@ -1,3 +1,4 @@
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   APERTURA_MIN,
   DIAS,
@@ -27,6 +28,7 @@ export function GrillaHorario({
   onClickBloque,
   onClickCelda,
 }: GrillaHorarioProps) {
+  const esMobile = useIsMobile();
   const bloquesPorDia = agruparPorDia(bloques);
   const horas = Array.from({ length: TOTAL_SLOTS / 2 }, (_, i) => APERTURA_MIN + i * 60);
 
@@ -65,7 +67,9 @@ export function GrillaHorario({
             <button
               key={`${dia}-${slotIndex}`}
               type="button"
-              className="border-b border-l hover:bg-accent/50"
+              aria-hidden={esMobile}
+              tabIndex={esMobile ? -1 : 0}
+              className="border-b border-l hover:bg-accent/50 max-md:pointer-events-none"
               style={{ gridColumn: diaIndex + 2, gridRow: 2 + slotIndex }}
               onClick={() => onClickCelda(dia, APERTURA_MIN + slotIndex * SLOT_MIN)}
             />

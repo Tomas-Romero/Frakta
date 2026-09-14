@@ -43,7 +43,7 @@ export function Horario() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
+      <div className="max-md:hidden">
         <Button onClick={abrirNuevo}>
           <Plus /> Nuevo bloque
         </Button>
@@ -55,6 +55,20 @@ export function Horario() {
         onClickBloque={abrirEdicion}
         onClickCelda={abrirEnCelda}
       />
+
+      {/* En mobile las franjas de 24px son demasiado chicas para un tap
+          preciso — se reemplaza el tap-en-celda por este botón flotante,
+          que abre el mismo formulario con los selectores de día/hora
+          explícitos que ya tiene BloqueForm. En desktop no hace falta:
+          tocar la celda ya precarga día/hora. */}
+      <Button
+        onClick={abrirNuevo}
+        size="icon-lg"
+        className="fixed left-4 z-40 rounded-full shadow-lg md:hidden bottom-[calc(5rem+env(safe-area-inset-bottom))]"
+        aria-label="Nuevo bloque de horario"
+      >
+        <Plus />
+      </Button>
 
       <BloqueForm
         open={formAbierto}

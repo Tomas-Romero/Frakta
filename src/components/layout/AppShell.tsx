@@ -44,7 +44,7 @@ export function AppShell() {
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
+        <main className="flex-1 overflow-auto p-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6">
           <div key={vistaActiva} className="vista-enter">
             <VistaActual vista={vistaActiva} />
           </div>

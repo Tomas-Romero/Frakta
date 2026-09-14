@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Download } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog as Dialog,
+  ResponsiveDialogContent as DialogContent,
+  ResponsiveDialogDescription as DialogDescription,
+  ResponsiveDialogHeader as DialogHeader,
+  ResponsiveDialogTitle as DialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { Button } from '@/components/ui/button';
 import { codificarEventoParaQr, cabeEnQr } from './qrPayload';
 import { exportarEventoComoArchivo } from './exportarEvento';

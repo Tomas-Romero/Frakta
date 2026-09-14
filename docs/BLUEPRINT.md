@@ -308,7 +308,27 @@ El mismo script inline de `index.html` que ya evitaba el flash de claro/oscuro (
 
 ---
 
-## 9. Riesgos y consideraciones finales
+## 9. Optimización mobile-first
+
+### 9.1 — Touch targets ≥44×44px: arreglo sistémico, no parche por archivo
+
+`Button` e `Input` ganaron `max-md:h-11`/`max-md:size-11` en su `cva`/clase base — un solo cambio en `src/components/ui/button.tsx` e `input.tsx` sube automáticamente todos los botones e inputs de la app en mobile, sin tocar ningún formulario. `Checkbox`/`Switch` ya resolvían esto con una hit-area invisible por pseudo-elemento (`after:-inset-*`); solo hizo falta ensanchar el alto (`max-md:after:-inset-y-3.5`) sin agrandar el glyph visible, que se vería roto a 44px.
+
+La grilla de Horario es la excepción deliberada: sus franjas de 30 minutos (24px) no se agrandan — eso casi duplicaría el alto total y arruinaría la vista semanal completa. En su lugar, en mobile el tap directo sobre una celda vacía queda inerte (`max-md:pointer-events-none`, más `aria-hidden`/`tabIndex={-1}` condicionados por `useIsMobile()`) y se reemplaza por un botón flotante que abre el mismo `BloqueForm` con sus selectores de día/hora explícitos. En desktop nada cambia: el tap-en-celda sigue precargando día/hora.
+
+### 9.2 — `ResponsiveDialog`: mismo primitivo Radix, distinto layout según viewport
+
+`Dialog`/`DialogContent` (shadcn) y `Sheet`/`SheetContent` envuelven exactamente el mismo `Dialog` de `radix-ui` — `Sheet` es ese mismo primitivo estilizado para deslizar desde un lado en vez de centrarse. Esa coincidencia de API hace que alternar entre ambos sea un simple `if` según `useIsMobile()`: `src/components/ui/responsive-dialog.tsx` expone `ResponsiveDialog`/`ResponsiveDialogContent`/etc., que eligen `Dialog` en desktop y `Sheet` (`side="bottom"`) en mobile.
+
+La migración de cada formulario existente fue un cambio de una sola línea: alias en el import (`ResponsiveDialogContent as DialogContent`, etc.) en vez de tocar el JSX de cada archivo. Un detalle que si no se resuelve rompe el layout: `SheetContent` no trae padding propio en el cuerpo (a diferencia de `DialogContent`, que sí) — `ResponsiveDialogContent` lo compensa aplicando `px-4 pb-4` a cualquier hijo directo que no sea el header/footer del Sheet (que ya traen su propio `p-4`), vía el selector `[&>*:not([data-slot='sheet-header']):not([data-slot='sheet-footer'])]`.
+
+### 9.3 — Safe-area en dispositivos con notch
+
+`viewport-fit=cover` en el meta viewport de `index.html` (requisito para que `env(safe-area-inset-*)` reporte algo en iOS Safari) + `pb-[env(safe-area-inset-bottom)]` en la barra inferior + el mismo ajuste en el padding inferior del contenido principal y en los elementos flotantes (Pomodoro, el nuevo FAB de Horario), para que ninguno quede pisado por la barra de gestos del sistema.
+
+---
+
+## 10. Riesgos y consideraciones finales
 
 - **Pérdida de datos.** El recordatorio de backup (sección 1) es la mitigación de base. Como mejora opcional, la File System Access API (Chrome/Edge) permite auto-export periódico a una carpeta elegida por el usuario — mencionarlo como mejora, no como base: Safari y Firefox no la soportan.
 - **Migraciones de esquema.** Versionar desde la Fase 0 (ver `ROADMAP.md`) no es previsión excesiva: es lo que evita que un cambio de forma más adelante rompa un backup exportado antes.
