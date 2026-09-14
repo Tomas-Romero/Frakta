@@ -20,6 +20,7 @@ import { exportarBackupComoArchivo, importarBackupDesdeTexto } from '@/db/backup
 import { obtenerConfig, actualizarConfig } from '@/db/db';
 import { reiniciarTodosLosDatos } from '@/db/reiniciar';
 import { useTema, cambiarTema } from '@/hooks/useTema';
+import { usePaleta, cambiarPaleta } from '@/hooks/usePaleta';
 import {
   pedirPermisoNotificaciones,
   permisoNotificaciones,
@@ -40,12 +41,20 @@ const OPCIONES_TEMA: { valor: ConfigApp['tema']; etiqueta: string; icono: typeof
   { valor: 'oscuro', etiqueta: 'Oscuro', icono: Moon },
 ];
 
+const OPCIONES_PALETA: { valor: ConfigApp['paleta']; etiqueta: string; color: string }[] = [
+  { valor: 'default', etiqueta: 'Frakta', color: '#4f7a62' },
+  { valor: 'oceano', etiqueta: 'Océano', color: '#1d5f8a' },
+  { valor: 'lila', etiqueta: 'Lila', color: '#a97cb0' },
+  { valor: 'minimalista', etiqueta: 'Minimalista', color: '#71717a' },
+];
+
 const PALABRA_CONFIRMACION = 'REINICIAR';
 
 export function AjustesBackup() {
   const [estado, setEstado] = useState<Estado>({ tipo: 'inactivo' });
   const inputRef = useRef<HTMLInputElement>(null);
   const tema = useTema();
+  const paleta = usePaleta();
   const config = useLiveQuery(() => obtenerConfig());
   const [permiso, setPermiso] = useState(permisoNotificaciones());
   const [persistido, setPersistido] = useState<boolean | null>(null);
@@ -123,23 +132,51 @@ export function AjustesBackup() {
           <CardTitle>Apariencia</CardTitle>
           <CardDescription>Elegí cómo se ve la app en este dispositivo.</CardDescription>
         </CardHeader>
-        <CardContent className="flex gap-2">
-          {OPCIONES_TEMA.map(({ valor, etiqueta, icono: Icono }) => (
-            <button
-              key={valor}
-              type="button"
-              onClick={() => void cambiarTema(valor)}
-              className={cn(
-                'flex flex-1 flex-col items-center gap-1.5 rounded-lg border py-3 text-sm transition-colors',
-                tema === valor
-                  ? 'border-primary bg-accent text-accent-foreground'
-                  : 'hover:bg-muted',
-              )}
-            >
-              <Icono className="size-4" />
-              {etiqueta}
-            </button>
-          ))}
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex gap-2">
+            {OPCIONES_TEMA.map(({ valor, etiqueta, icono: Icono }) => (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => void cambiarTema(valor)}
+                className={cn(
+                  'flex flex-1 flex-col items-center gap-1.5 rounded-lg border py-3 text-sm transition-colors',
+                  tema === valor
+                    ? 'border-primary bg-accent text-accent-foreground'
+                    : 'hover:bg-muted',
+                )}
+              >
+                <Icono className="size-4" />
+                {etiqueta}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <p className="text-sm text-muted-foreground">Paleta de color</p>
+            <div className="flex gap-2">
+              {OPCIONES_PALETA.map(({ valor, etiqueta, color }) => (
+                <button
+                  key={valor}
+                  type="button"
+                  onClick={() => void cambiarPaleta(valor)}
+                  title={etiqueta}
+                  className={cn(
+                    'flex flex-1 flex-col items-center gap-1.5 rounded-lg border py-3 text-sm transition-colors',
+                    paleta === valor
+                      ? 'border-primary bg-accent text-accent-foreground'
+                      : 'hover:bg-muted',
+                  )}
+                >
+                  <span
+                    className="size-4 rounded-full ring-1 ring-foreground/10"
+                    style={{ background: color }}
+                  />
+                  {etiqueta}
+                </button>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
 

@@ -62,6 +62,12 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 - [x] Fallback a archivo `.json` para eventos que no entran en un QR
 - [x] Todo el código de QR/cámara se carga con `import()` dinámico, fuera del bundle inicial
 
+## Fase 9 — Temas y paletas
+
+- [x] 3 paletas nuevas (Océano, Lila, Minimalista), cada una con su propio par claro/oscuro
+- [x] Eje `paleta` independiente de `tema` — cero bump de schema, cero flash al cargar
+- [x] Selector de paleta en Ajustes, isotipo de marca fijo en las 4 opciones
+
 ---
 
-**Estado actual: 8 fases completas.**
+**Estado actual: 9 fases completas.**

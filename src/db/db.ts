@@ -18,6 +18,11 @@ export const SCHEMA_VERSION_ACTUAL = 3;
 export interface ConfigApp {
   id: 'app';
   tema: 'auto' | 'claro' | 'oscuro';
+  // Eje independiente de `tema`: cada paleta define su propio par claro/oscuro
+  // (ver src/index.css), así que elegir una paleta nunca rompe la garantía de
+  // "auto respeta el sistema". El isotipo de marca (verde/dorado) no cambia
+  // entre paletas — ver docs/BLUEPRINT.md sección 9.
+  paleta: 'default' | 'oceano' | 'lila' | 'minimalista';
   escalaNotas: '1-10' | '0-100';
   recordatoriosActivos: boolean;
   almacenamientoPersistenteActivo: boolean;
@@ -70,6 +75,7 @@ export const db = new OrganizadorDB();
 const CONFIG_POR_DEFECTO: ConfigApp = {
   id: 'app',
   tema: 'auto',
+  paleta: 'default',
   escalaNotas: '1-10',
   recordatoriosActivos: true,
   almacenamientoPersistenteActivo: true,

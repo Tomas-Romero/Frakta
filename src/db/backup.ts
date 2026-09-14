@@ -108,6 +108,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
     },
     config: {
       tema: config.tema,
+      paleta: config.paleta,
       escalaNotas: config.escalaNotas,
       recordatoriosActivos: config.recordatoriosActivos,
       almacenamientoPersistenteActivo: config.almacenamientoPersistenteActivo,

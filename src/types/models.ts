@@ -209,6 +209,7 @@ export interface BackupCompleto {
   };
   config: {
     tema: 'auto' | 'claro' | 'oscuro';
+    paleta: 'default' | 'oceano' | 'lila' | 'minimalista';
     escalaNotas: '1-10' | '0-100';
     recordatoriosActivos: boolean;
     almacenamientoPersistenteActivo: boolean;

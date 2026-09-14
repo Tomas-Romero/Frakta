@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AppShell } from '@/components/layout/AppShell';
 import { useTema } from '@/hooks/useTema';
+import { usePaleta } from '@/hooks/usePaleta';
 import { obtenerConfig } from '@/db/db';
 import { revisarRecordatorios, registrarSincronizacionPeriodica } from '@/lib/notificaciones';
 
@@ -9,6 +10,7 @@ const INTERVALO_RECORDATORIOS_MS = 15 * 60 * 1000;
 
 function App() {
   useTema();
+  usePaleta();
 
   useEffect(() => {
     const revisarSiCorresponde = async () => {

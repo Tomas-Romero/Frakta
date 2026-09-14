@@ -178,6 +178,7 @@ export const backupCompletoSchema = z.object({
   }),
   config: z.object({
     tema: z.enum(['auto', 'claro', 'oscuro']),
+    paleta: z.enum(['default', 'oceano', 'lila', 'minimalista']).default('default'),
     escalaNotas: z.enum(['1-10', '0-100']),
     recordatoriosActivos: z.boolean().default(true),
     almacenamientoPersistenteActivo: z.boolean().default(true),

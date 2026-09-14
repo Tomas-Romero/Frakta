@@ -8,13 +8,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Frakta</title>
     <script>
-      // Evita el flash de tema incorrecto antes de que Dexie resuelva la
-      // config real. Ver src/lib/tema.ts.
+      // Evita el flash de tema/paleta incorrectos antes de que Dexie resuelva
+      // la config real. Ver src/lib/tema.ts.
       (function () {
         try {
           var t = localStorage.getItem('frakta-tema') || 'auto';
           var oscuro = t === 'oscuro' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
           if (oscuro) document.documentElement.classList.add('dark');
+
+          var p = localStorage.getItem('frakta-paleta') || 'default';
+          if (p !== 'default') document.documentElement.dataset.theme = p;
         } catch (e) {}
       })();
     </script>

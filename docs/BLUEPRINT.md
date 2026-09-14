@@ -288,7 +288,27 @@ Ambos módulos (`qrcode`, `qr-scanner` + su worker, `lz-string`) se cargan con `
 
 ---
 
-## 8. Riesgos y consideraciones finales
+## 8. Sistema de temas y paletas
+
+Además de Claro/Oscuro/Auto, la app ofrece paletas de color alternativas (Océano, Lila, Minimalista) para personalizar la apariencia sin tocar el modo de contraste.
+
+### 8.1 — Eje independiente, no un valor único
+
+`ConfigApp.tema` (`auto|claro|oscuro`) y `ConfigApp.paleta` (`default|oceano|lila|minimalista`) son dos campos **ortogonales**. Fusionarlos en un solo valor rompería la garantía de "Auto respeta el sistema": si Océano fuera un único tema fijo, elegirlo obligaría a abandonar el modo automático. En cambio, cada paleta define su propio par claro/oscuro — `[data-theme="oceano"]` y `[data-theme="oceano"].dark` — con exactamente los mismos nombres de variable que ya usa el tema por defecto (`--background`, `--primary`, `--sidebar-*`, `--chart-1..5`, etc.), así que ningún componente existente cambia una sola línea al elegir una paleta nueva.
+
+Es un cambio puramente aditivo: `ConfigApp.paleta` es solo un campo más del store `config` (que ya solo indexa `'id'` a nivel Dexie), sin bump de `SCHEMA_VERSION_ACTUAL`.
+
+### 8.2 — El isotipo de marca no cambia entre paletas
+
+`--brand-green`, `--brand-green-soft` y `--brand-gold` (el logo y el gradiente de texto "Frakta" del sidebar) quedan **fijos siempre**, en cualquier paleta — son la identidad de marca, no el acento de UI. Cada paleta nueva sobreescribe únicamente los tokens semánticos (`--primary`, `--accent`, `--chart-*`, `--sidebar-*`, etc.); `--destructive` tampoco cambia, para que "error" siga leyéndose igual en todas partes.
+
+### 8.3 — Cero flash, en dos ejes a la vez
+
+El mismo script inline de `index.html` que ya evitaba el flash de claro/oscuro (ver sección 1) ahora también lee `localStorage['frakta-paleta']` y setea `document.documentElement.dataset.theme` antes del primer paint. `usePaleta()` (hook hermano de `useTema()`, mismo mecanismo: Dexie como fuente de verdad, `useLiveQuery` + `useEffect`) sincroniza ese estado inicial con la config real apenas Dexie resuelve.
+
+---
+
+## 9. Riesgos y consideraciones finales
 
 - **Pérdida de datos.** El recordatorio de backup (sección 1) es la mitigación de base. Como mejora opcional, la File System Access API (Chrome/Edge) permite auto-export periódico a una carpeta elegida por el usuario — mencionarlo como mejora, no como base: Safari y Firefox no la soportan.
 - **Migraciones de esquema.** Versionar desde la Fase 0 (ver `ROADMAP.md`) no es previsión excesiva: es lo que evita que un cambio de forma más adelante rompa un backup exportado antes.
