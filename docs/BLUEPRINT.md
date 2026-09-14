@@ -264,9 +264,34 @@ Plan de entrenamiento (rutina de split), registro de sesiones y seguimiento nutr
 
 ---
 
-## 7. Riesgos y consideraciones finales
+## 7. Sincronización P2P por QR (Gastos Compartidos)
+
+Compartir un evento entre dos dispositivos sin backend: uno genera un QR, el otro lo escanea (o, para eventos grandes, uno exporta un archivo `.json` y el otro lo importa). Ningún dato pasa por un servidor de terceros — ni siquiera para la señalización, a diferencia de WebRTC.
+
+### 7.1 — Por qué QR y no WebRTC
+
+WebRTC/PeerJS necesita un servidor de señalización de un tercero para el handshake inicial y que ambos dispositivos estén online al mismo tiempo — dos cosas que no encajan con el caso de uso real (compartir la liquidación de un asado horas después, no en el momento) ni con la filosofía "cero backend" de Frakta. QR no depende de nada externo y funciona de forma completamente asíncrona.
+
+### 7.2 — Paquetes y codificación
+
+`qrcode` (generación) + `qr-scanner` (lectura por cámara, sin UI propia que pelear) + `lz-string` (compresión). El JSON del evento se comprime con `compressToBase64()` — texto ASCII, no bytes crudos: las librerías de escaneo devuelven texto decodificado, así que ir a bytes arriesga corrupción silenciosa. El costo de ~33% más tamaño se acepta porque hay un fallback para cuando no entra.
+
+### 7.3 — Techo de tamaño y fallback a archivo
+
+Con corrección de errores `M` y una versión de QR moderada (no la 40, donde el escaneo con cámara de celular se vuelve poco confiable), el techo práctico ronda 1500 caracteres en base64 tras comprimir — alcanza para un evento típico de amigos, no para uno con decenas de gastos. `cabeEnQr()` calcula el tamaño *antes* de intentar generar el código; si no entra, la UI ofrece exportar/importar el mismo evento como archivo `.json` (mismo mecanismo que el backup completo, aplicado a un solo evento) en vez de construir un QR multi-parte — complejidad que esta escala de uso no justifica.
+
+### 7.4 — Siempre un evento nuevo, con remapeo de ids
+
+Escanear (o importar un archivo) **nunca** sobrescribe ni mergea un evento existente — siempre crea uno nuevo, con los ids de `Participante` remapeados a valores nuevos (y las referencias `pagadoPor`/`participantes` de cada `GastoItem` actualizadas junto con ellos). Misma filosofía "todo o nada" que el import de backup completo: no hay una respuesta correcta para reconciliar automáticamente participantes entre dos espacios de ids generados en dispositivos distintos, así que ni se intenta.
+
+Ambos módulos (`qrcode`, `qr-scanner` + su worker, `lz-string`) se cargan con `import()` dinámico recién al abrir "Compartir" o "Escanear QR" — no viajan en el bundle inicial, mismo criterio que ExcelJS y Recharts.
+
+---
+
+## 8. Riesgos y consideraciones finales
 
 - **Pérdida de datos.** El recordatorio de backup (sección 1) es la mitigación de base. Como mejora opcional, la File System Access API (Chrome/Edge) permite auto-export periódico a una carpeta elegida por el usuario — mencionarlo como mejora, no como base: Safari y Firefox no la soportan.
 - **Migraciones de esquema.** Versionar desde la Fase 0 (ver `ROADMAP.md`) no es previsión excesiva: es lo que evita que un cambio de forma más adelante rompa un backup exportado antes.
 - **Localización numérica.** La coma decimal y el separador de miles de Argentina (sección 2.1) hay que validarlos en toda la app que toque números — notas, montos — no solo en el importador de CSV.
 - **Privacidad real, sin letra chica.** Sin backend no hay términos de servicio de datos que redactar, pero sí hay que comunicar bien, sin tecnicismos, que borrar los datos del navegador borra todo lo que no se haya exportado.
+- **QR/archivos como entrada no confiable.** Un código QR o un archivo `.json` compartido por otra persona es, ni más ni menos, otra fuente de datos externos — se valida con el mismo rigor Zod "todo o nada" que un backup, y nunca sobrescribe datos existentes (sección 7.4). Los permisos de cámara denegados o la ausencia de cámara se muestran como un estado de error legible, nunca como una excepción sin manejar.

@@ -75,3 +75,32 @@ export async function eliminarGasto(eventoId: string, gastoId: string): Promise<
     gastos: evento.gastos.filter((g) => g.id !== gastoId),
   });
 }
+
+type DatosEventoImportado = Omit<EventoCompartido, 'id'>;
+
+/**
+ * Crea un evento nuevo a partir de un evento externo (QR o archivo) — nunca
+ * sobrescribe ni mergea uno existente, misma filosofía "todo o nada" que el
+ * import de backup completo. Los ids de participantes (y las referencias que
+ * los usan en cada gasto) se remapean a ids locales nuevos, para no chocar
+ * con datos ya presentes ni depender de que el otro dispositivo haya
+ * generado ids únicos globalmente.
+ */
+export async function crearEventoDesdeImportacionQr(
+  datos: DatosEventoImportado,
+): Promise<EventoCompartido> {
+  const mapaIds = new Map(datos.participantes.map((p) => [p.id, crypto.randomUUID()]));
+  const evento: EventoCompartido = {
+    id: crypto.randomUUID(),
+    nombre: datos.nombre,
+    participantes: datos.participantes.map((p) => ({ ...p, id: mapaIds.get(p.id)! })),
+    gastos: datos.gastos.map((g) => ({
+      ...g,
+      id: crypto.randomUUID(),
+      pagadoPor: g.pagadoPor.map((id) => mapaIds.get(id) ?? id),
+      participantes: g.participantes.map((id) => mapaIds.get(id) ?? id),
+    })),
+  };
+  await db.eventosCompartidos.add(evento);
+  return evento;
+}

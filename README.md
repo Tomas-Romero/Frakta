@@ -77,6 +77,7 @@ Pantalla de entrada, **de solo lectura** — ningún widget tiene un formulario 
 - Cada gasto tiene su propia lista de "quién pagó" y "quién participa" — **excluir a alguien de un gasto puntual es simplemente no tildarlo** ahí (si alguien no toma alcohol, no se lo incluye en la birra y listo, sin ninguna lógica especial de exclusión).
 - **Liquidación mínima**: un algoritmo goloso (el mismo enfoque que usa Splitwise) reduce todas las deudas cruzadas a la menor cantidad de transferencias posible — como mucho *N-1* transferencias para *N* personas.
 - Vista **"quién le debe a quién"**: el balance neto de cada participante y la lista concreta de transferencias sugeridas para saldar todo.
+- **Compartir por QR, sin servidor**: generá un código QR de un evento (comprimido con `lz-string`) para que otra persona lo escanee desde su propio Frakta y lo importe como un evento nuevo — nunca se mezcla con uno existente, y ninguno de los dos dispositivos necesita estar conectado a nada más que a su propia cámara. Si el evento tiene demasiados gastos para entrar en un QR legible, se ofrece exportarlo/importarlo como archivo `.json` en su lugar.
 
 ### 🏋️ Hábitos y Entrenamiento
 
@@ -112,6 +113,7 @@ Pantalla de entrada, **de solo lectura** — ningún widget tiene un formulario 
 | CSV | **PapaParse** | Detección robusta de delimitador y manejo de comillas/encoding. |
 | Fechas | **date-fns** | Tree-shakeable — solo se empaqueta lo que se usa. |
 | Validación | **Zod + React Hook Form** | El mismo esquema valida formularios *y* los archivos importados (JSON/CSV) antes de tocar la base local. |
+| QR | **qrcode** + **qr-scanner** + **lz-string** | Generar y leer el código, comprimiendo el JSON del evento para que entre en un QR legible con cámara de celular. |
 | PWA | **vite-plugin-pwa** | Service worker propio (`injectManifest`) con precache del código y un handler de Periodic Background Sync. |
 
 ## ¿Cómo lo veo funcionando? (live demo)
@@ -150,5 +152,6 @@ npm run lint      # oxlint
 - **Sin flash de tema oscuro/claro.** Como la preferencia real vive en Dexie (que carga async), un script mínimo e inline en `index.html` lee un caché en `localStorage` y aplica la clase `dark` *antes* de que React monte nada — evita el parpadeo típico de las apps que resuelven el tema después del primer render.
 - **Recordatorios honestos sobre sus propios límites.** Sin backend no existe push garantizado con la app cerrada en todos los navegadores. Por eso hay dos niveles bien separados: uno garantizado (mientras la pestaña está abierta) y uno de mejor esfuerzo (Periodic Background Sync desde un service worker propio, que solo funciona en Chrome/Android con la PWA instalada) — y la interfaz nunca promete el segundo nivel como si fuera el primero.
 - **ExcelJS en vez de SheetJS.** La edición gratuita de SheetJS no puede escribir estilos de celda (colores, rellenos) sin la versión paga; ExcelJS sí, de forma nativa — por eso las exportaciones de Materias y Finanzas se ven como una planilla real y no como texto plano con extensión `.xlsx`.
+- **Compartir sin servidor, con la misma filosofía "todo o nada" del backup.** Escanear un QR (o importar el archivo de fallback) nunca sobrescribe ni mergea un evento existente — siempre crea uno nuevo, remapeando los ids de participantes (y las referencias que los usan en cada gasto) a valores locales nuevos. Es el mismo principio del import de backup completo, aplicado a un solo evento en vez de a toda la base.
 - **Un patrón de transacción resuelto una vez, reusado dos veces.** El fix de una race condition real en `actualizarConfig()` (dos toggles de Ajustes tocados casi al mismo tiempo podían pisarse entre sí) se convirtió en el molde para `actualizarRegistroNutricion()` en Hábitos: mismo problema (lectura + escritura no atómica sobre un registro editado en partes independientes), misma solución (envolver ambas operaciones en una única `db.transaction('rw', ...)`).
 - **Los módulos pesados no viajan en el bundle inicial.** ExcelJS y Recharts se cargan con `import()` dinámico recién cuando el usuario aprieta "Exportar Excel" o abre la pestaña de Reportes — el bundle principal quedó en ~230 KB gzip en vez de cargar de entrada las ~370 KB extra que pesan esas dos librerías juntas.

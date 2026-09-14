@@ -89,12 +89,12 @@ const presupuestoSchema = z.object({
   montoMensual: z.number().min(0),
 });
 
-const participanteSchema = z.object({
+export const participanteSchema = z.object({
   id: z.string(),
   nombre: z.string(),
 });
 
-const gastoItemSchema = z.object({
+export const gastoItemSchema = z.object({
   id: z.string(),
   descripcion: z.string(),
   monto: z.number(),

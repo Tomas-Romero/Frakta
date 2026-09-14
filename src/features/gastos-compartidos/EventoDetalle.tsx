@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
+import { ArrowLeft, QrCode, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -19,6 +19,12 @@ import { GastoForm } from './GastoForm';
 import { Liquidacion } from './Liquidacion';
 import type { EventoCompartido, GastoItem } from '@/types/models';
 
+// qrcode + lz-string no viajan en el bundle inicial — solo se cargan cuando
+// el usuario efectivamente abre "Compartir" (ver docs/BLUEPRINT.md sección 8).
+const CompartirQrDialog = lazy(() =>
+  import('./CompartirQrDialog').then((m) => ({ default: m.CompartirQrDialog })),
+);
+
 interface EventoDetalleProps {
   evento: EventoCompartido;
   onVolver: () => void;
@@ -28,6 +34,7 @@ export function EventoDetalle({ evento, onVolver }: EventoDetalleProps) {
   const [formGastoAbierto, setFormGastoAbierto] = useState(false);
   const [gastoEditando, setGastoEditando] = useState<GastoItem | undefined>(undefined);
   const [confirmarEliminar, setConfirmarEliminar] = useState(false);
+  const [compartirAbierto, setCompartirAbierto] = useState(false);
 
   const participantesPorId = new Map(evento.participantes.map((p) => [p.id, p]));
 
@@ -38,6 +45,9 @@ export function EventoDetalle({ evento, onVolver }: EventoDetalleProps) {
           <ArrowLeft />
         </Button>
         <h2 className="flex-1 text-lg font-medium">{evento.nombre}</h2>
+        <Button variant="ghost" size="icon" onClick={() => setCompartirAbierto(true)}>
+          <QrCode />
+        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -96,6 +106,16 @@ export function EventoDetalle({ evento, onVolver }: EventoDetalleProps) {
         participantesEvento={evento.participantes}
         gasto={gastoEditando}
       />
+
+      {compartirAbierto && (
+        <Suspense fallback={null}>
+          <CompartirQrDialog
+            open={compartirAbierto}
+            onOpenChange={setCompartirAbierto}
+            evento={evento}
+          />
+        </Suspense>
+      )}
 
       <AlertDialog open={confirmarEliminar} onOpenChange={setConfirmarEliminar}>
         <AlertDialogContent>

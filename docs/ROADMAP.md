@@ -55,6 +55,13 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 - [x] Tracking nutricional diario: proteína objetivo/lograda y checkbox de creatina
 - [x] `SCHEMA_VERSION_ACTUAL` v2→v3 con migración de backup correspondiente
 
+## Fase 8 — Sincronización P2P por QR
+
+- [x] Generar QR de un evento compartido (`qrcode` + `lz-string`)
+- [x] Escanear un QR con la cámara (`qr-scanner`) y crear un evento nuevo con ids remapeados
+- [x] Fallback a archivo `.json` para eventos que no entran en un QR
+- [x] Todo el código de QR/cámara se carga con `import()` dinámico, fuera del bundle inicial
+
 ---
 
-**Estado actual: 7 fases completas.**
+**Estado actual: 8 fases completas.**

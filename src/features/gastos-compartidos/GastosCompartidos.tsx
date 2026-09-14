@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Plus, Users } from 'lucide-react';
+import { Plus, QrCode, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,11 +16,19 @@ import { crearEvento } from '@/db/repositorios/eventosCompartidos';
 import { formatNumeroAr } from '@/lib/numeroAr';
 import { EventoDetalle } from './EventoDetalle';
 
+// qr-scanner (+ su worker) no viaja en el bundle inicial — solo se carga
+// cuando el usuario efectivamente abre "Escanear QR" (ver docs/BLUEPRINT.md
+// sección 8).
+const EscanearQrDialog = lazy(() =>
+  import('./EscanearQrDialog').then((m) => ({ default: m.EscanearQrDialog })),
+);
+
 export function GastosCompartidos() {
   const eventos = useLiveQuery(() => db.eventosCompartidos.toArray(), [], []);
   const [eventoSeleccionadoId, setEventoSeleccionadoId] = useState<string | null>(null);
   const [formAbierto, setFormAbierto] = useState(false);
   const [nombreNuevo, setNombreNuevo] = useState('');
+  const [escanearAbierto, setEscanearAbierto] = useState(false);
 
   if (!eventos) return null;
 
@@ -43,9 +51,12 @@ export function GastosCompartidos() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
+      <div className="flex flex-wrap gap-2">
         <Button onClick={() => setFormAbierto(true)}>
           <Plus /> Nuevo evento
+        </Button>
+        <Button variant="outline" onClick={() => setEscanearAbierto(true)}>
+          <QrCode /> Escanear QR
         </Button>
       </div>
 
@@ -100,6 +111,16 @@ export function GastosCompartidos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {escanearAbierto && (
+        <Suspense fallback={null}>
+          <EscanearQrDialog
+            open={escanearAbierto}
+            onOpenChange={setEscanearAbierto}
+            onImportado={(eventoId) => setEventoSeleccionadoId(eventoId)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
