@@ -113,6 +113,7 @@ const ejercicioPlanificadoSchema = z.object({
   nombre: z.string(),
   seriesObjetivo: z.number().int().min(0),
   repeticionesObjetivo: z.number().int().min(0),
+  icono: z.string().nullable().default(null),
 });
 
 const diaRutinaSchema = z.object({
@@ -138,14 +139,18 @@ const ejercicioTriserieSchema = z.object({
   repeticiones: z.number().int().min(0),
 });
 
+const setRealizadoSchema = z.object({
+  repeticiones: z.number().int().min(0),
+  pesoKg: z.number().min(0),
+});
+
 const registroEjercicioSchema = z.object({
   id: z.string(),
   fecha: z.string(),
   tipo: tipoRegistroEjercicioSchema,
+  icono: z.string().nullable().default(null),
   nombreEjercicio: z.string().nullable(),
-  series: z.number().int().min(0).nullable(),
-  repeticiones: z.number().int().min(0).nullable(),
-  pesoKg: z.number().min(0).nullable(),
+  seriesRealizadas: z.array(setRealizadoSchema).nullable(),
   ejerciciosTriserie: z.array(ejercicioTriserieSchema).nullable(),
   duracionMin: z.number().min(0).nullable(),
   distanciaKm: z.number().min(0).nullable(),
@@ -157,6 +162,22 @@ const registroNutricionSchema = z.object({
   proteinaObjetivoG: z.number().min(0),
   proteinaLogradaG: z.number().min(0),
   creatinaTomada: z.boolean(),
+});
+
+const tipoRecurrenciaFechaSchema = z.enum(['unica', 'anual', 'mensual', 'meses_especificos']);
+
+const fechaImportanteSchema = z.object({
+  id: z.string(),
+  nombre: z.string(),
+  icono: z.string().nullable(),
+  tipoRecurrencia: tipoRecurrenciaFechaSchema,
+  fechaUnica: z.string().nullable(),
+  diaAnual: z.number().int().min(1).max(31).nullable(),
+  mesAnual: z.number().int().min(1).max(12).nullable(),
+  diaMensual: z.number().int().min(1).max(31).nullable(),
+  diaMesesEspecificos: z.number().int().min(1).max(31).nullable(),
+  mesesEspecificos: z.array(z.number().int().min(1).max(12)).nullable(),
+  notas: z.string().nullable(),
 });
 
 export const backupCompletoSchema = z.object({
@@ -175,6 +196,7 @@ export const backupCompletoSchema = z.object({
     rutinas: z.array(rutinaSchema).default([]),
     registrosEjercicio: z.array(registroEjercicioSchema).default([]),
     registrosNutricion: z.array(registroNutricionSchema).default([]),
+    fechasImportantes: z.array(fechaImportanteSchema).default([]),
   }),
   config: z.object({
     tema: z.enum(['auto', 'claro', 'oscuro']),

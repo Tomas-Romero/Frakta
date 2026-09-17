@@ -5,6 +5,7 @@ import {
   Wallet,
   Users,
   Dumbbell,
+  CalendarHeart,
   Settings,
 } from 'lucide-react';
 import {
@@ -30,6 +31,7 @@ const MODULOS_CONTENIDO: { vista: Vista; etiqueta: string; icono: typeof ListTod
   { vista: 'finanzas', etiqueta: 'Finanzas', icono: Wallet },
   { vista: 'gastos-compartidos', etiqueta: 'Gastos Compartidos', icono: Users },
   { vista: 'habitos', etiqueta: 'Hábitos', icono: Dumbbell },
+  { vista: 'calendario', etiqueta: 'Calendario', icono: CalendarHeart },
 ];
 
 export function AppSidebar() {

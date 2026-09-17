@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useFieldArray, useForm, type Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Trash2 } from 'lucide-react';
+import { Ban, Plus, Trash2 } from 'lucide-react';
 import {
   ResponsiveDialog as Dialog,
   ResponsiveDialogContent as DialogContent,
@@ -14,6 +14,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Form,
   FormControl,
   FormField,
@@ -24,7 +31,10 @@ import {
 import { parseNumeroAr } from '@/lib/numeroAr';
 import { crearRutina, actualizarRutina } from '@/db/repositorios/rutinas';
 import { DIAS, ETIQUETA_DIA } from '@/features/horario/layoutSemana';
+import { ICONOS_FITNESS, NOMBRES_ICONOS_FITNESS, type NombreIconoFitness } from './iconosFitness';
 import type { Rutina } from '@/types/models';
+
+const SIN_ICONO = '__ninguno__';
 
 const diaSemanaSchema = z.enum([
   'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo',
@@ -34,6 +44,7 @@ const ejercicioPlanificadoSchema = z.object({
   nombre: z.string().trim().min(1, 'Nombre requerido'),
   seriesObjetivo: z.string().min(1, 'Requerido'),
   repeticionesObjetivo: z.string().min(1, 'Requerido'),
+  icono: z.string(),
 });
 
 const diaRutinaSchema = z.object({
@@ -65,6 +76,7 @@ function valoresPorDefecto(rutina?: Rutina): ValoresFormulario {
         nombre: e.nombre,
         seriesObjetivo: String(e.seriesObjetivo),
         repeticionesObjetivo: String(e.repeticionesObjetivo),
+        icono: e.icono ?? SIN_ICONO,
       })),
     })),
   };
@@ -97,6 +109,7 @@ export function RutinaForm({ open, onOpenChange, rutina }: RutinaFormProps) {
             nombre: e.nombre.trim(),
             seriesObjetivo: Math.trunc(parseNumeroAr(e.seriesObjetivo)),
             repeticionesObjetivo: Math.trunc(parseNumeroAr(e.repeticionesObjetivo)),
+            icono: e.icono === SIN_ICONO ? null : e.icono,
           })),
         })),
         activa: rutina?.activa ?? false,
@@ -199,7 +212,42 @@ function DiaRutinaFields({ control, diaIndex, etiqueta }: DiaRutinaFieldsProps) 
 
       <div className="flex flex-col gap-2">
         {campos.fields.map((campo, index) => (
-          <div key={campo.id} className="grid grid-cols-[1fr_4.5rem_4.5rem_auto] items-start gap-2">
+          <div
+            key={campo.id}
+            className="grid grid-cols-[5.5rem_1fr_4.5rem_4.5rem_auto] items-start gap-2"
+          >
+            <FormField
+              control={control}
+              name={`dias.${diaIndex}.ejercicios.${index}.icono`}
+              render={({ field }) => (
+                <FormItem>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={SIN_ICONO}>
+                        <span className="flex items-center gap-2">
+                          <Ban className="size-4" /> Sin ícono
+                        </span>
+                      </SelectItem>
+                      {NOMBRES_ICONOS_FITNESS.map((nombre) => {
+                        const Icono = ICONOS_FITNESS[nombre as NombreIconoFitness];
+                        return (
+                          <SelectItem key={nombre} value={nombre}>
+                            <span className="flex items-center gap-2">
+                              <Icono className="size-4" /> {nombre}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
             <FormField
               control={control}
               name={`dias.${diaIndex}.ejercicios.${index}.nombre`}
@@ -246,7 +294,9 @@ function DiaRutinaFields({ control, diaIndex, etiqueta }: DiaRutinaFieldsProps) 
           variant="outline"
           size="sm"
           className="self-start"
-          onClick={() => campos.append({ nombre: '', seriesObjetivo: '', repeticionesObjetivo: '' })}
+          onClick={() =>
+            campos.append({ nombre: '', seriesObjetivo: '', repeticionesObjetivo: '', icono: SIN_ICONO })
+          }
         >
           <Plus /> Agregar ejercicio
         </Button>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CalendarClock,
+  CalendarHeart,
   CreditCard,
   GraduationCap,
   ListChecks,
@@ -15,7 +16,9 @@ import { useUiStore, type Vista } from '@/store/uiStore';
 import { proximaClase } from '@/features/horario/proximaClase';
 import { promedioGeneral } from '@/features/academico/metricas';
 import { resumenMes, proximosVencimientos } from '@/features/finanzas/metricas';
-import { parseISO, isBefore, addHours } from 'date-fns';
+import { proximaOcurrencia } from '@/features/calendario/recurrencia';
+import { parseISO, isBefore, addHours, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 // El Dashboard es siempre de solo lectura: cada widget resume su módulo y
 // lleva a él, nunca trae formularios de edición propios.
@@ -56,9 +59,19 @@ export function Dashboard() {
   const movimientos = useLiveQuery(() => db.movimientos.toArray(), [], []);
   const presupuestos = useLiveQuery(() => db.presupuestos.toArray(), [], []);
   const suscripciones = useLiveQuery(() => db.suscripciones.toArray(), [], []);
+  const fechasImportantes = useLiveQuery(() => db.fechasImportantes.toArray(), [], []);
   const config = useLiveQuery(() => obtenerConfig());
 
-  if (!materias || !bloques || !tareas || !movimientos || !presupuestos || !suscripciones || !config) {
+  if (
+    !materias ||
+    !bloques ||
+    !tareas ||
+    !movimientos ||
+    !presupuestos ||
+    !suscripciones ||
+    !fechasImportantes ||
+    !config
+  ) {
     return null;
   }
 
@@ -81,6 +94,11 @@ export function Dashboard() {
   const promedio = promedioGeneral(materias);
 
   const debitosProximos = proximosVencimientos(suscripciones, ahora, 7);
+
+  const proximasFechas = fechasImportantes
+    .map((f) => ({ fecha: f, proxima: proximaOcurrencia(f, ahora) }))
+    .filter((x): x is { fecha: (typeof fechasImportantes)[number]; proxima: Date } => x.proxima !== null)
+    .sort((a, b) => a.proxima.getTime() - b.proxima.getTime());
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -141,6 +159,25 @@ export function Dashboard() {
           </>
         ) : (
           <CardDescription>Nada programado para los próximos 7 días.</CardDescription>
+        )}
+      </Widget>
+
+      <Widget
+        titulo="Próxima fecha importante"
+        icono={CalendarHeart}
+        color="bg-rose-600/15 text-rose-700 dark:text-rose-400"
+        vista="calendario"
+      >
+        {proximasFechas.length > 0 ? (
+          <>
+            <p className="font-medium">{proximasFechas[0].fecha.nombre}</p>
+            <CardDescription>
+              {format(proximasFechas[0].proxima, "d 'de' MMMM", { locale: es })}
+              {proximasFechas.length > 1 ? ` · + ${proximasFechas.length - 1} más` : ''}
+            </CardDescription>
+          </>
+        ) : (
+          <CardDescription>No hay fechas importantes cargadas.</CardDescription>
         )}
       </Widget>
     </div>

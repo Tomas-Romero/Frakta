@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { eliminarRegistroEjercicio } from '@/db/repositorios/registrosEjercicio';
 import { formatNumeroAr } from '@/lib/numeroAr';
+import { prPorEjercicio } from './metricas';
+import { ICONOS_FITNESS, esIconoFitnessValido } from './iconosFitness';
 import type { RegistroEjercicio } from '@/types/models';
 
 const ETIQUETA_TIPO: Record<RegistroEjercicio['tipo'], string> = {
@@ -34,7 +36,10 @@ const ETIQUETA_TIPO: Record<RegistroEjercicio['tipo'], string> = {
 
 function resumen(r: RegistroEjercicio): string {
   if (r.tipo === 'fuerza') {
-    return `${r.nombreEjercicio} — ${r.series}x${r.repeticiones} @ ${formatNumeroAr(r.pesoKg ?? 0)} kg`;
+    const sets = r.seriesRealizadas ?? [];
+    if (sets.length === 0) return r.nombreEjercicio ?? '—';
+    const detalle = sets.map((s) => `${s.repeticiones}×${formatNumeroAr(s.pesoKg)}kg`).join(', ');
+    return `${r.nombreEjercicio} — ${detalle}`;
   }
   if (r.tipo === 'triserie_core') {
     return (r.ejerciciosTriserie ?? []).map((e) => e.nombre).join(' + ') || '—';
@@ -42,6 +47,10 @@ function resumen(r: RegistroEjercicio): string {
   return `${formatNumeroAr(r.duracionMin ?? 0)} min${
     r.distanciaKm !== null ? ` — ${formatNumeroAr(r.distanciaKm)} km` : ''
   }`;
+}
+
+function pesoMaximoDeSesion(r: RegistroEjercicio): number {
+  return (r.seriesRealizadas ?? []).reduce((max, s) => Math.max(max, s.pesoKg), 0);
 }
 
 interface RegistroEjercicioListProps {
@@ -53,6 +62,7 @@ export function RegistroEjercicioList({ registros, onEditar }: RegistroEjercicio
   const [aEliminar, setAEliminar] = useState<RegistroEjercicio | null>(null);
 
   const ordenados = [...registros].sort((a, b) => b.fecha.localeCompare(a.fecha));
+  const records = prPorEjercicio(registros);
 
   if (ordenados.length === 0) {
     return (
@@ -75,23 +85,37 @@ export function RegistroEjercicioList({ registros, onEditar }: RegistroEjercicio
             </TableRow>
           </TableHeader>
           <TableBody>
-            {ordenados.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{format(parseISO(r.fecha), 'd MMM yyyy', { locale: es })}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{ETIQUETA_TIPO[r.tipo]}</Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground">{resumen(r)}</TableCell>
-                <TableCell className="flex justify-end gap-1 text-right">
-                  <Button variant="ghost" size="icon" onClick={() => onEditar(r)}>
-                    <Pencil />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setAEliminar(r)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {ordenados.map((r) => {
+              const Icono = r.icono && esIconoFitnessValido(r.icono) ? ICONOS_FITNESS[r.icono] : null;
+              const esPR =
+                r.tipo === 'fuerza' &&
+                r.nombreEjercicio !== null &&
+                pesoMaximoDeSesion(r) > 0 &&
+                pesoMaximoDeSesion(r) >= (records.get(r.nombreEjercicio) ?? 0);
+              return (
+                <TableRow key={r.id}>
+                  <TableCell>{format(parseISO(r.fecha), 'd MMM yyyy', { locale: es })}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{ETIQUETA_TIPO[r.tipo]}</Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      {Icono && <Icono className="size-4 shrink-0" />}
+                      {resumen(r)}
+                      {esPR && <Badge className="shrink-0">PR</Badge>}
+                    </span>
+                  </TableCell>
+                  <TableCell className="flex justify-end gap-1 text-right">
+                    <Button variant="ghost" size="icon" onClick={() => onEditar(r)}>
+                      <Pencil />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setAEliminar(r)}>
+                      <Trash2 />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

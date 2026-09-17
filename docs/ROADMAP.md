@@ -75,6 +75,20 @@ El módulo de import/export JSON completo se construye antes que cualquier módu
 - [x] `ResponsiveDialog` (Dialog en desktop, Bottom Sheet en mobile) migrado a los ~15 formularios existentes
 - [x] Safe-area (`env(safe-area-inset-bottom)`) en la bottom nav, el contenido principal y los elementos flotantes
 
+## Fase 11 — Calendario de fechas importantes
+
+- [x] 4 tipos de recurrencia (única, todos los años, todos los meses, algunos meses) con selector de ícono
+- [x] Grilla mensual + lista plana ordenada por próxima ocurrencia
+- [x] `proximaOcurrencia()`/`ocurrenciaEnMes()` puras, reusadas por la grilla, la lista y el widget del Dashboard
+- [x] Nuevo widget "Próxima fecha importante" en el Dashboard
+
+## Fase 12 — Hábitos: series por-set, íconos y reportes
+
+- [x] `RegistroEjercicio` pasa de una serie/repeticiones/peso única a un array de sets reales (`seriesRealizadas`)
+- [x] Primera migración de datos en vivo del proyecto (`.upgrade()` de Dexie) + migración equivalente de backup
+- [x] Íconos en ejercicios planificados (Rutina) y registrados (Registro), badge de PR calculado en la lista
+- [x] Nueva pestaña "Reportes" con progreso de peso máximo, récord personal y constancia semanal
+
 ---
 
-**Estado actual: 10 fases completas.**
+**Estado actual: 12 fases completas.**

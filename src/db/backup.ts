@@ -25,6 +25,46 @@ const migraciones: Record<number, (json: unknown) => unknown> = {
       },
     };
   },
+  // v3 no tenía Calendario de fechas importantes, y RegistroEjercicio (tipo
+  // 'fuerza') guardaba una sola serie/repeticiones/peso en vez de un array de
+  // sets reales (agregado en Fase 11/12). Mismo criterio que la migración
+  // .upgrade() de Dexie en db.ts, pero acá sobre el JSON crudo de un backup
+  // importado — son dos caminos de código independientes que deben terminar
+  // en la misma forma.
+  3: (json) => {
+    const j = json as { datos?: Record<string, unknown> };
+    const registrosViejos = Array.isArray(j.datos?.registrosEjercicio)
+      ? (j.datos.registrosEjercicio as Record<string, unknown>[])
+      : [];
+
+    const registrosEjercicio = registrosViejos.map((registro) => {
+      const { series, repeticiones, pesoKg, ...resto } = registro;
+      const esFuerza = resto.tipo === 'fuerza';
+      const cantidadSeries = typeof series === 'number' ? series : 0;
+      const repsPorSet = typeof repeticiones === 'number' ? repeticiones : 0;
+      const pesoPorSet = typeof pesoKg === 'number' ? pesoKg : 0;
+
+      return {
+        ...resto,
+        icono: resto.icono ?? null,
+        seriesRealizadas: esFuerza
+          ? Array.from({ length: Math.max(cantidadSeries, 1) }, () => ({
+              repeticiones: repsPorSet,
+              pesoKg: pesoPorSet,
+            }))
+          : null,
+      };
+    });
+
+    return {
+      ...j,
+      datos: {
+        ...j.datos,
+        registrosEjercicio,
+        fechasImportantes: j.datos?.fechasImportantes ?? [],
+      },
+    };
+  },
 };
 
 /**
@@ -73,6 +113,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
     rutinas,
     registrosEjercicio,
     registrosNutricion,
+    fechasImportantes,
     config,
   ] = await Promise.all([
     db.materias.toArray(),
@@ -86,6 +127,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
     db.rutinas.toArray(),
     db.registrosEjercicio.toArray(),
     db.registrosNutricion.toArray(),
+    db.fechasImportantes.toArray(),
     obtenerConfig(),
   ]);
 
@@ -105,6 +147,7 @@ export async function generarBackup(): Promise<BackupCompleto> {
       rutinas,
       registrosEjercicio,
       registrosNutricion,
+      fechasImportantes,
     },
     config: {
       tema: config.tema,
@@ -157,6 +200,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
       db.rutinas,
       db.registrosEjercicio,
       db.registrosNutricion,
+      db.fechasImportantes,
       db.config,
     ],
     async () => {
@@ -172,6 +216,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.rutinas.clear(),
         db.registrosEjercicio.clear(),
         db.registrosNutricion.clear(),
+        db.fechasImportantes.clear(),
         db.config.clear(),
       ]);
 
@@ -187,6 +232,7 @@ export async function importarBackupDesdeTexto(jsonTexto: string): Promise<Backu
         db.rutinas.bulkAdd(backup.datos.rutinas),
         db.registrosEjercicio.bulkAdd(backup.datos.registrosEjercicio),
         db.registrosNutricion.bulkAdd(backup.datos.registrosNutricion),
+        db.fechasImportantes.bulkAdd(backup.datos.fechasImportantes),
         db.config.add({ id: 'app', ...backup.config }),
       ]);
     },

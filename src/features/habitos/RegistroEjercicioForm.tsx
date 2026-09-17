@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
+import { Ban, Plus, Trash2 } from 'lucide-react';
 import {
   ResponsiveDialog as Dialog,
   ResponsiveDialogContent as DialogContent,
@@ -23,13 +24,21 @@ import {
 import { cn } from '@/lib/utils';
 import { parseNumeroAr, formatNumeroAr } from '@/lib/numeroAr';
 import { crearRegistroEjercicio, actualizarRegistroEjercicio } from '@/db/repositorios/registrosEjercicio';
+import { ICONOS_FITNESS, NOMBRES_ICONOS_FITNESS, type NombreIconoFitness } from './iconosFitness';
 import type { RegistroEjercicio, TipoRegistroEjercicio } from '@/types/models';
+
+const SIN_ICONO = '__ninguno__';
 
 const TIPOS: { valor: TipoRegistroEjercicio; etiqueta: string }[] = [
   { valor: 'fuerza', etiqueta: 'Fuerza' },
   { valor: 'triserie_core', etiqueta: 'Triserie core' },
   { valor: 'cardio', etiqueta: 'Cardio' },
 ];
+
+const setRealizadoSchema = z.object({
+  repeticiones: z.string(),
+  pesoKg: z.string(),
+});
 
 const ejercicioTriserieSchema = z.object({
   nombre: z.string().trim(),
@@ -41,10 +50,9 @@ const esquemaFormulario = z
   .object({
     fecha: z.string().min(1, 'Requerido'),
     tipo: z.enum(['fuerza', 'triserie_core', 'cardio']),
+    icono: z.string(),
     nombreEjercicio: z.string(),
-    series: z.string(),
-    repeticiones: z.string(),
-    pesoKg: z.string(),
+    seriesRealizadas: z.array(setRealizadoSchema),
     ejerciciosTriserie: z.array(ejercicioTriserieSchema).length(3),
     duracionMin: z.string(),
     distanciaKm: z.string(),
@@ -55,11 +63,17 @@ const esquemaFormulario = z
       if (v.nombreEjercicio.trim() === '') {
         ctx.addIssue({ code: 'custom', path: ['nombreEjercicio'], message: 'Requerido' });
       }
-      if (v.series.trim() === '') ctx.addIssue({ code: 'custom', path: ['series'], message: 'Requerido' });
-      if (v.repeticiones.trim() === '') {
-        ctx.addIssue({ code: 'custom', path: ['repeticiones'], message: 'Requerido' });
+      if (v.seriesRealizadas.length === 0) {
+        ctx.addIssue({ code: 'custom', path: ['seriesRealizadas'], message: 'Agregá al menos una serie' });
       }
-      if (v.pesoKg.trim() === '') ctx.addIssue({ code: 'custom', path: ['pesoKg'], message: 'Requerido' });
+      v.seriesRealizadas.forEach((s, i) => {
+        if (s.repeticiones.trim() === '') {
+          ctx.addIssue({ code: 'custom', path: ['seriesRealizadas', i, 'repeticiones'], message: 'Requerido' });
+        }
+        if (s.pesoKg.trim() === '') {
+          ctx.addIssue({ code: 'custom', path: ['seriesRealizadas', i, 'pesoKg'], message: 'Requerido' });
+        }
+      });
     }
     if (v.tipo === 'triserie_core') {
       v.ejerciciosTriserie.forEach((e, i) => {
@@ -94,10 +108,9 @@ function valoresPorDefecto(registro?: RegistroEjercicio): ValoresFormulario {
     return {
       fecha: format(new Date(), 'yyyy-MM-dd'),
       tipo: 'fuerza',
+      icono: SIN_ICONO,
       nombreEjercicio: '',
-      series: '',
-      repeticiones: '',
-      pesoKg: '',
+      seriesRealizadas: [{ repeticiones: '', pesoKg: '' }],
       ejerciciosTriserie: triserieVacia(),
       duracionMin: '',
       distanciaKm: '',
@@ -107,10 +120,14 @@ function valoresPorDefecto(registro?: RegistroEjercicio): ValoresFormulario {
   return {
     fecha: registro.fecha,
     tipo: registro.tipo,
+    icono: registro.icono ?? SIN_ICONO,
     nombreEjercicio: registro.nombreEjercicio ?? '',
-    series: registro.series === null ? '' : String(registro.series),
-    repeticiones: registro.repeticiones === null ? '' : String(registro.repeticiones),
-    pesoKg: registro.pesoKg === null ? '' : formatNumeroAr(registro.pesoKg),
+    seriesRealizadas: registro.seriesRealizadas?.length
+      ? registro.seriesRealizadas.map((s) => ({
+          repeticiones: String(s.repeticiones),
+          pesoKg: formatNumeroAr(s.pesoKg),
+        }))
+      : [{ repeticiones: '', pesoKg: '' }],
     ejerciciosTriserie: registro.ejerciciosTriserie
       ? registro.ejerciciosTriserie.map((e) => ({
           nombre: e.nombre,
@@ -136,6 +153,8 @@ export function RegistroEjercicioForm({ open, onOpenChange, registro }: Registro
     defaultValues: valoresPorDefecto(registro),
   });
 
+  const camposSeries = useFieldArray({ control: form.control, name: 'seriesRealizadas' });
+
   useEffect(() => {
     if (open) form.reset(valoresPorDefecto(registro));
   }, [open, registro, form]);
@@ -147,10 +166,15 @@ export function RegistroEjercicioForm({ open, onOpenChange, registro }: Registro
       const datos = {
         fecha: valores.fecha,
         tipo: valores.tipo,
+        icono: valores.icono === SIN_ICONO ? null : valores.icono,
         nombreEjercicio: valores.tipo === 'fuerza' ? valores.nombreEjercicio.trim() : null,
-        series: valores.tipo === 'fuerza' ? Math.trunc(parseNumeroAr(valores.series)) : null,
-        repeticiones: valores.tipo === 'fuerza' ? Math.trunc(parseNumeroAr(valores.repeticiones)) : null,
-        pesoKg: valores.tipo === 'fuerza' ? parseNumeroAr(valores.pesoKg) : null,
+        seriesRealizadas:
+          valores.tipo === 'fuerza'
+            ? valores.seriesRealizadas.map((s) => ({
+                repeticiones: Math.trunc(parseNumeroAr(s.repeticiones)),
+                pesoKg: parseNumeroAr(s.pesoKg),
+              }))
+            : null,
         ejerciciosTriserie:
           valores.tipo === 'triserie_core'
             ? valores.ejerciciosTriserie.map((e) => ({
@@ -228,6 +252,50 @@ export function RegistroEjercicioForm({ open, onOpenChange, registro }: Registro
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="icono"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ícono (opcional)</FormLabel>
+                  <div className="grid grid-cols-9 gap-1.5 rounded-md border p-2">
+                    <button
+                      type="button"
+                      title="Sin ícono"
+                      onClick={() => field.onChange(SIN_ICONO)}
+                      className={cn(
+                        'flex size-8 items-center justify-center rounded-md border text-muted-foreground',
+                        field.value === SIN_ICONO
+                          ? 'border-primary bg-accent'
+                          : 'border-transparent hover:bg-muted',
+                      )}
+                    >
+                      <Ban className="size-4" />
+                    </button>
+                    {NOMBRES_ICONOS_FITNESS.map((nombre) => {
+                      const Icono = ICONOS_FITNESS[nombre as NombreIconoFitness];
+                      return (
+                        <button
+                          key={nombre}
+                          type="button"
+                          title={nombre}
+                          onClick={() => field.onChange(nombre)}
+                          className={cn(
+                            'flex size-8 items-center justify-center rounded-md border',
+                            field.value === nombre
+                              ? 'border-primary bg-accent'
+                              : 'border-transparent hover:bg-muted',
+                          )}
+                        >
+                          <Icono className="size-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </FormItem>
+              )}
+            />
+
             {tipo === 'fuerza' && (
               <>
                 <FormField
@@ -243,46 +311,62 @@ export function RegistroEjercicioForm({ open, onOpenChange, registro }: Registro
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="series"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Series</FormLabel>
-                        <FormControl>
-                          <Input inputMode="numeric" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="repeticiones"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Reps</FormLabel>
-                        <FormControl>
-                          <Input inputMode="numeric" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pesoKg"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Peso (kg)</FormLabel>
-                        <FormControl>
-                          <Input inputMode="decimal" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Series</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => camposSeries.append({ repeticiones: '', pesoKg: '' })}
+                    >
+                      <Plus /> Agregar serie
+                    </Button>
+                  </div>
+                  {camposSeries.fields.map((campo, index) => (
+                    <div key={campo.id} className="grid grid-cols-[3rem_1fr_1fr_auto] items-start gap-2">
+                      <span className="pt-2 text-sm text-muted-foreground">#{index + 1}</span>
+                      <FormField
+                        control={form.control}
+                        name={`seriesRealizadas.${index}.repeticiones`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input inputMode="numeric" placeholder="Reps" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`seriesRealizadas.${index}.pesoKg`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input inputMode="decimal" placeholder="Peso (kg)" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => camposSeries.remove(index)}
+                        disabled={camposSeries.fields.length === 1}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  ))}
+                  {form.formState.errors.seriesRealizadas?.root?.message && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.seriesRealizadas.root.message}
+                    </p>
+                  )}
                 </div>
               </>
             )}

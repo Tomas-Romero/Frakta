@@ -10,13 +10,13 @@ No hay servidor. Materias, horarios, tareas, gastos y liquidaciones entre amigos
 
 ## 1. Arquitectura de navegación (UX/UI)
 
-Siete destinos, un dashboard de lectura y una puerta de emergencia (el backup) siempre a mano.
+Nueve destinos, un dashboard de lectura y una puerta de emergencia (el backup) siempre a mano.
 
 ### Sidebar, no pestañas
 
-Con cinco módulos más Dashboard y Ajustes, una barra de pestañas horizontal ya está en el límite: en pantallas de 1280px reales empieza a truncar etiquetas o a envolver en dos líneas. Una barra lateral fija escala a más ítems sin rediseño, admite ícono + etiqueta en desktop y colapsa a solo-ícono cuando el usuario la achica, y le da al usuario un ancla espacial constante ("Finanzas siempre vive en el tercer ícono") que una barra de pestañas que se reordena no ofrece.
+Con siete módulos más Dashboard y Ajustes, una barra de pestañas horizontal ya está en el límite: en pantallas de 1280px reales empieza a truncar etiquetas o a envolver en dos líneas. Una barra lateral fija escala a más ítems sin rediseño, admite ícono + etiqueta en desktop y colapsa a solo-ícono cuando el usuario la achica, y le da al usuario un ancla espacial constante ("Finanzas siempre vive en el tercer ícono") que una barra de pestañas que se reordena no ofrece.
 
-El orden no es alfabético, es por frecuencia de uso esperada: **Dashboard** (entrada) → **Tareas** (consulta diaria) → **Horario** (consulta diaria, cambia poco) → **Académico** (consulta semanal/mensual) → **Finanzas** (consulta semanal) → **Gastos Compartidos** (uso puntual, por evento) → separado por una línea al pie → **Ajustes & Backup** (no es un módulo de contenido, es la red de seguridad de todos los demás).
+El orden no es alfabético, es por frecuencia de uso esperada: **Dashboard** (entrada) → **Tareas** (consulta diaria) → **Horario** (consulta diaria, cambia poco) → **Académico** (consulta semanal/mensual) → **Finanzas** (consulta semanal) → **Gastos Compartidos** (uso puntual, por evento) → **Hábitos** (registro frecuente, no diario) → **Calendario** (consulta puntual, fechas de todo el año) → separado por una línea al pie → **Ajustes & Backup** (no es un módulo de contenido, es la red de seguridad de todos los demás).
 
 ```mermaid
 graph LR
@@ -29,21 +29,23 @@ graph LR
   M --> M3[Tareas]
   M --> M4[Finanzas]
   M --> M5["Gastos Compartidos"]
+  M --> M6[Hábitos]
+  M --> M7[Calendario]
 ```
 
 *La sidebar agrupa en tres capas con distinto propósito (lectura, trabajo, sistema) — eso ordena tanto el menú como el modelo mental del usuario.*
 
 ### El dashboard es de lectura, no de edición
 
-Sus widgets — próxima clase, tareas que vencen en 48 h, resumen de gasto del mes contra presupuesto, promedio académico actual, débitos automáticos próximos y un mini-pomodoro — son todos de un vistazo, y cada uno lleva a su módulo si el usuario quiere actuar. Esto evita que el Dashboard se convierta en un octavo módulo con su propia lógica de edición para mantener.
+Sus widgets — próxima clase, tareas que vencen en 48 h, resumen de gasto del mes contra presupuesto, promedio académico actual, débitos automáticos próximos y próxima fecha importante — son todos de un vistazo, y cada uno lleva a su módulo si el usuario quiere actuar. Esto evita que el Dashboard se convierta en un módulo más con su propia lógica de edición para mantener.
 
 ### Captura rápida: un FAB con memoria de contexto
 
-Un botón flotante persistente (visible en los cinco módulos de contenido, no en Ajustes) abre un formulario mínimo de captura — tarea, gasto o idea — sin cambiar de pantalla. La única inteligencia que vale la pena construir: si el FAB se abre estando en Finanzas, precarga el formulario de movimiento; en cualquier otro lado, abre tarea rápida por default.
+Un botón flotante persistente (visible en los módulos de contenido, no en Ajustes) abre un formulario mínimo de captura — tarea, gasto o idea — sin cambiar de pantalla. La única inteligencia que vale la pena construir: si el FAB se abre estando en Finanzas, precarga el formulario de movimiento; en cualquier otro lado, abre tarea rápida por default.
 
 ### Responsive: de sidebar a barra inferior
 
-En desktop, la sidebar es fija y colapsable a solo-íconos. En mobile, siete destinos no entran en una barra inferior legible — el límite práctico son cuatro o cinco slots. Resolución: **Dashboard, Tareas, Horario** fijos (consulta diaria) + un cuarto slot **"Más"** que despliega Académico, Finanzas, Gastos Compartidos y Ajustes en una hoja modal. El FAB se mantiene flotante sobre la barra inferior en las tres primeras pestañas.
+En desktop, la sidebar es fija y colapsable a solo-íconos. En mobile, nueve destinos no entran en una barra inferior legible — el límite práctico son cuatro o cinco slots. Resolución: **Dashboard, Tareas, Horario** fijos (consulta diaria) + un cuarto slot **"Más"** que despliega Académico, Finanzas, Gastos Compartidos, Hábitos, Calendario y Ajustes en una hoja modal. El FAB se mantiene flotante sobre la barra inferior en las tres primeras pestañas.
 
 ### Primer uso, sin login
 
@@ -202,7 +204,8 @@ Los tipos completos ya están escritos en [`src/types/models.ts`](../src/types/m
 - **Tarea / Proyecto**: tipo (`academica | personal | proyecto | idea`), estado Kanban, prioridad, fecha límite, `pomodorosCompletados`.
 - **MovimientoFinanciero / SuscripcionRecurrente**: monto, categoría, fecha o día del mes fijo para recurrentes.
 - **EventoCompartido**: `participantes` + `gastos`, cada gasto con su propia lista de participantes (ver sección 2.3).
-- **Rutina / RegistroEjercicio / RegistroNutricion**: módulo de Hábitos y Entrenamiento, ver sección 6.
+- **Rutina / RegistroEjercicio / RegistroNutricion**: módulo de Hábitos y Entrenamiento, ver sección 6 y sección 11 — `RegistroEjercicio` (tipo `'fuerza'`) guarda `seriesRealizadas: SetRealizado[]`, un peso/repeticiones por cada set real, no un promedio único.
+- **FechaImportante**: Calendario de fechas importantes, ver sección 10.
 - **BackupCompleto**: el objeto que viaja en el JSON de exportación. Lleva `schemaVersion` — campo no negociable. Cada importación corre primero por una función `migrarBackup(json)` que mira `schemaVersion` y aplica transformaciones incrementales (v1→v2, v2→v3…) antes de tocar la base local, y luego por validación Zod antes de escribir una sola fila. Un archivo que falla la validación se rechaza entero, nunca se mezcla parcialmente con los datos existentes.
 
 ---
@@ -328,7 +331,37 @@ La migración de cada formulario existente fue un cambio de una sola línea: ali
 
 ---
 
-## 10. Riesgos y consideraciones finales
+## 10. Calendario de fechas importantes
+
+Exámenes puntuales, cumpleaños, aniversarios y días especiales, con cuatro formas de repetirse: una vez, todos los años (mismo día y mes), todos los meses (mismo día) o solo en algunos meses elegidos.
+
+### 10.1 — Un tipo, campos nullable por rama (otra vez)
+
+`FechaImportante` sigue el mismo molde que `BloqueHorario`/`RegistroEjercicio`: un `tipoRecurrencia` discriminante (`'unica' | 'anual' | 'mensual' | 'meses_especificos'`) y campos nullable específicos de cada rama, en vez de cuatro tablas o una jerarquía de subtipos. La lógica de "¿qué día cae esto en tal mes?" vive en un solo lugar puro — `src/features/calendario/recurrencia.ts` — consumido por la grilla mensual, la lista plana y el widget del Dashboard, para que ningún componente reimplemente el cálculo de recurrencia por su cuenta.
+
+### 10.2 — `ocurrenciaEnMes` y `proximaOcurrencia`
+
+`ocurrenciaEnMes(fecha, mes)` devuelve el día del mes en que cae una fecha dentro del mes mostrado (o `null` si no ocurre), clampeando fin de mes igual que ya hacía `diaEfectivo()` en el calendario de suscripciones de Finanzas. `proximaOcurrencia(fecha, desde)` busca hacia adelante hasta 24 meses (más que los 2 meses de suscripciones, porque `meses_especificos` puede saltear casi todo el año) y devuelve `null` para una fecha `'unica'` que ya pasó — nunca se auto-archiva ni se borra, simplemente deja de aparecer como "próxima" y queda visible en su mes histórico dentro de la grilla, como registro.
+
+---
+
+## 11. Hábitos: series por-set, íconos y reportes
+
+### 11.1 — De una serie promedio a un set real por fila
+
+El registro de fuerza guardaba `series`, `repeticiones` y `pesoKg` como tres números únicos para toda la sesión — un supuesto de "series uniformes" que no refleja cómo se entrena en la práctica (fatiga progresiva: menos peso o menos repeticiones en cada set sucesivo). Ahora `RegistroEjercicio` guarda `seriesRealizadas: SetRealizado[]`, un peso y repeticiones por cada set individual.
+
+### 11.2 — La primera migración de datos en vivo del proyecto
+
+Hasta esta versión, cada bump de `SCHEMA_VERSION_ACTUAL` solo agregaba tablas nuevas vacías vía `.stores()` — nunca hacía falta transformar filas ya guardadas. Convertir `series`/`repeticiones`/`pesoKg` (tres números) en `seriesRealizadas` (un array) sí lo requiere, así que esta es la primera vez que el proyecto usa `.upgrade()` de Dexie: `this.version(4).stores({...}).upgrade(async (tx) => { await tx.table('registrosEjercicio').toCollection().modify(...) })`. Cada fila vieja de tipo `'fuerza'` se convierte en N sets idénticos (N = la cantidad de series que tenía) con el mismo peso/reps — preserva toda la información bajo el supuesto implícito que ya tenía la app, nunca se pierde un registro. La migración equivalente para un backup `.json` viejo vive por separado en `migraciones[3]` de `backup.ts` — son dos caminos de código independientes (uno transforma IndexedDB en vivo, el otro un archivo importado) que deben terminar en la misma forma final.
+
+### 11.3 — PR calculado, no guardado
+
+El "récord personal" de un ejercicio nunca se guarda como un campo aparte — se calcula (`prPorEjercicio()`, `recordPersonal()` en `src/features/habitos/metricas.ts`) tomando el peso máximo entre todos los sets de todas las sesiones de ese ejercicio. Guardarlo como un valor cacheado invitaría a que se desincronice del dato real cada vez que se edita o borra un registro viejo.
+
+---
+
+## 12. Riesgos y consideraciones finales
 
 - **Pérdida de datos.** El recordatorio de backup (sección 1) es la mitigación de base. Como mejora opcional, la File System Access API (Chrome/Edge) permite auto-export periódico a una carpeta elegida por el usuario — mencionarlo como mejora, no como base: Safari y Firefox no la soportan.
 - **Migraciones de esquema.** Versionar desde la Fase 0 (ver `ROADMAP.md`) no es previsión excesiva: es lo que evita que un cambio de forma más adelante rompa un backup exportado antes.

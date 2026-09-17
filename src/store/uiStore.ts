@@ -13,6 +13,7 @@ export type Vista =
   | 'finanzas'
   | 'gastos-compartidos'
   | 'habitos'
+  | 'calendario'
   | 'ajustes';
 
 interface UiState {

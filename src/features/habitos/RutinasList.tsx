@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { activarRutina, eliminarRutina } from '@/db/repositorios/rutinas';
 import { ETIQUETA_DIA } from '@/features/horario/layoutSemana';
+import { ICONOS_FITNESS, esIconoFitnessValido } from './iconosFitness';
 import type { Rutina } from '@/types/models';
 
 interface RutinasListProps {
@@ -59,8 +60,27 @@ export function RutinasList({ rutinas, onEditar }: RutinasListProps) {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2 text-sm text-muted-foreground">
               {r.dias.map((d) => (
-                <span key={d.dia} className="rounded-md border px-2 py-1">
-                  {ETIQUETA_DIA[d.dia]}: {d.foco.trim() || 'Descanso'} ({d.ejercicios.length})
+                <span key={d.dia} className="flex flex-col gap-1 rounded-md border px-2 py-1">
+                  <span>
+                    {ETIQUETA_DIA[d.dia]}: {d.foco.trim() || 'Descanso'} ({d.ejercicios.length})
+                  </span>
+                  {d.ejercicios.length > 0 && (
+                    <span className="flex flex-wrap gap-1">
+                      {d.ejercicios.map((e, i) => {
+                        const Icono = e.icono && esIconoFitnessValido(e.icono) ? ICONOS_FITNESS[e.icono] : null;
+                        return (
+                          <span
+                            key={i}
+                            title={e.nombre}
+                            className="flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[11px]"
+                          >
+                            {Icono && <Icono className="size-3 shrink-0" />}
+                            <span className="max-w-20 truncate">{e.nombre}</span>
+                          </span>
+                        );
+                      })}
+                    </span>
+                  )}
                 </span>
               ))}
             </CardContent>

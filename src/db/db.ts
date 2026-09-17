@@ -11,9 +11,10 @@ import type {
   Rutina,
   RegistroEjercicio,
   RegistroNutricion,
+  FechaImportante,
 } from '../types/models';
 
-export const SCHEMA_VERSION_ACTUAL = 3;
+export const SCHEMA_VERSION_ACTUAL = 4;
 
 export interface ConfigApp {
   id: 'app';
@@ -40,6 +41,7 @@ export class OrganizadorDB extends Dexie {
   rutinas!: EntityTable<Rutina, 'id'>;
   registrosEjercicio!: EntityTable<RegistroEjercicio, 'id'>;
   registrosNutricion!: EntityTable<RegistroNutricion, 'fecha'>;
+  fechasImportantes!: EntityTable<FechaImportante, 'id'>;
   config!: EntityTable<ConfigApp, 'id'>;
 
   constructor() {
@@ -62,11 +64,44 @@ export class OrganizadorDB extends Dexie {
     });
 
     // v3: agrega el módulo de Hábitos y Entrenamiento (BLUEPRINT.md sección 7).
-    this.version(SCHEMA_VERSION_ACTUAL).stores({
+    this.version(3).stores({
       rutinas: 'id, activa',
       registrosEjercicio: 'id, fecha, tipo',
       registrosNutricion: 'fecha',
     });
+
+    // v4: agrega Calendario de fechas importantes y convierte RegistroEjercicio
+    // (tipo 'fuerza') de una sola serie/repeticiones/peso a un array de sets
+    // reales, cada uno con su propio peso/reps (BLUEPRINT.md secciones 10 y 11).
+    // `registrosEjercicio` no cambia sus índices (id, fecha, tipo), solo el
+    // contenido no indexado — por eso no se re-declara en `.stores()`, solo
+    // se transforma en `.upgrade()`. Primera migración de datos en vivo del
+    // proyecto: hasta acá, cada bump solo agregaba tablas nuevas vacías.
+    this.version(SCHEMA_VERSION_ACTUAL)
+      .stores({
+        fechasImportantes: 'id, tipoRecurrencia',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('registrosEjercicio')
+          .toCollection()
+          .modify((registro) => {
+            const esFuerza = registro.tipo === 'fuerza';
+            const series = typeof registro.series === 'number' ? registro.series : 0;
+            const repeticiones =
+              typeof registro.repeticiones === 'number' ? registro.repeticiones : 0;
+            const pesoKg = typeof registro.pesoKg === 'number' ? registro.pesoKg : 0;
+
+            registro.seriesRealizadas = esFuerza
+              ? Array.from({ length: Math.max(series, 1) }, () => ({ repeticiones, pesoKg }))
+              : null;
+            if (registro.icono === undefined) registro.icono = null;
+
+            delete registro.series;
+            delete registro.repeticiones;
+            delete registro.pesoKg;
+          });
+      });
   }
 }
 

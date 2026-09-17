@@ -29,7 +29,7 @@ Eso trae ventajas reales (privacidad total, cero latencia de red, funciona sin c
 
 ## ¿Para qué sirve?
 
-Frakta se organiza en un dashboard de entrada, seis módulos de contenido y una pantalla de ajustes, todo accesible desde la barra lateral. Esta es la lista completa y detallada de lo que hace cada uno:
+Frakta se organiza en un dashboard de entrada, siete módulos de contenido y una pantalla de ajustes, todo accesible desde la barra lateral. Esta es la lista completa y detallada de lo que hace cada uno:
 
 ### 📊 Dashboard
 
@@ -40,6 +40,7 @@ Pantalla de entrada, **de solo lectura** — ningún widget tiene un formulario 
 - **Gasto del mes vs. presupuesto**: cuánto gastaste este mes contra el total presupuestado (si configuraste alguno).
 - **Promedio académico**: tu promedio general actual, en la escala de notas que elegiste (1-10 o 0-100).
 - **Débitos automáticos próximos**: qué suscripciones recurrentes vencen en los próximos 7 días.
+- **Próxima fecha importante**: la fecha más cercana de tu Calendario (cumpleaños, examen, aniversario), sea cual sea su recurrencia.
 
 ### 🎓 Académico
 
@@ -81,9 +82,17 @@ Pantalla de entrada, **de solo lectura** — ningún widget tiene un formulario 
 
 ### 🏋️ Hábitos y Entrenamiento
 
-- **Rutina**: un plan de split (pensado para 5 días de entrenamiento) con los 7 días de la semana disponibles — a los que no entrenás les dejás el foco vacío o les escribís "Descanso". Cada día tiene su propia lista de ejercicios planificados (nombre, series y repeticiones objetivo). Solo una rutina puede estar "activa" a la vez.
-- **Registro**: cargá una sesión real de tres tipos — **fuerza** (ejercicio, series, repeticiones, peso), **triserie de core** (siempre 3 ejercicios encadenados) o **cardio** (duración y, opcionalmente, distancia, pensado para bici fija). El formulario cambia de campos según el tipo elegido.
+- **Rutina**: un plan de split (pensado para 5 días de entrenamiento) con los 7 días de la semana disponibles — a los que no entrenás les dejás el foco vacío o les escribís "Descanso". Cada día tiene su propia lista de ejercicios planificados (nombre, series y repeticiones objetivo, con ícono a elección). Solo una rutina puede estar "activa" a la vez.
+- **Registro**: cargá una sesión real de tres tipos — **fuerza** (ejercicio + cada serie por separado, con su propio peso y repeticiones, porque en la práctica una serie real de fuerza no rinde lo mismo que la anterior), **triserie de core** (siempre 3 ejercicios encadenados) o **cardio** (duración y, opcionalmente, distancia, pensado para bici fija). El formulario cambia de campos según el tipo elegido, y cada registro puede llevar su propio ícono. La lista marca con un badge **"PR"** cuando una sesión iguala o supera tu récord histórico de peso en ese ejercicio.
+- **Reportes**: progreso de peso máximo por ejercicio a lo largo del tiempo, tu récord personal con la fecha en que lo lograste, y un gráfico de constancia (sesiones por semana) de las últimas 8 semanas.
 - **Nutrición**: un tracker diario rápido — gramos de proteína objetivo vs. consumidos y un check de "creatina tomada". El objetivo de proteína de un día nuevo hereda el del día anterior para no tener que re-tipearlo, y un historial de los últimos 14 días muestra el cumplimiento de un vistazo.
+
+### 📅 Calendario
+
+- Fechas importantes con 4 formas de repetirse: **una vez** (un examen puntual), **todos los años** (cumpleaños, aniversarios), **todos los meses** (algo que se repite mes a mes) o **solo algunos meses** que elijas (ej. los finales de cada cuatrimestre).
+- Ícono a elección para cada fecha (torta de cumpleaños, birrete de graduación, trofeo, estrella y más), para reconocerlas de un vistazo.
+- **Grilla mensual** navegable, igual de familiar que el calendario de vencimientos de Finanzas, más una **lista plana** ordenada por la próxima vez que ocurre cada una.
+- Una fecha "única" que ya pasó no se borra ni se oculta — deja de aparecer como "próxima", pero se mantiene visible en su mes, como registro histórico.
 
 ### ⚙️ Ajustes
 
@@ -149,6 +158,7 @@ npm run lint      # oxlint
 - **La liquidación de gastos compartidos** reduce un problema que en su forma exacta es NP-difícil (partición de subconjuntos) a un algoritmo goloso de `O(N log N)` que empareja en cada paso al mayor acreedor con el mayor deudor — el mismo truco que usa Splitwise. Da como mucho *N-1* transferencias y en la práctica coincide con el óptimo casi siempre. Ver [`liquidar.ts`](src/features/gastos-compartidos/liquidar.ts).
 - **Todo import es todo-o-nada.** JSON, CSV o Excel: el archivo entero se valida contra un esquema Zod *antes* de que se escriba la primera fila en Dexie. Una fila inválida en medio de 200 rechaza las 200, nunca deja una carga a medias.
 - **La app ya tiene una migración de esquema real en producción propia.** Cuando se agregó la entidad `Presupuesto` (necesaria para el reporte de presupuesto vs. real), el número de versión de Dexie subió de 1 a 2 y se escribió la primera migración de verdad en `migrarBackup()` — probada de punta a punta contra un backup viejo sintético para asegurarse de que nadie pierde datos por actualizar la app.
+- **Y ahora también migra datos ya guardados, no solo backups.** Convertir el registro de fuerza de "una serie promedio" a "cada set real por separado" significaba transformar filas que ya existían en el IndexedDB de cada usuario, no solo agregar una tabla vacía — la primera vez que el proyecto usa `.upgrade()` de Dexie. Se probó forzando a mano una base vieja con el formato anterior y confirmando que cada fila migra sin perder un solo dato.
 - **Sin flash de tema oscuro/claro (ni de paleta).** Como la preferencia real vive en Dexie (que carga async), un script mínimo e inline en `index.html` lee un caché en `localStorage` y aplica la clase `dark` y el atributo de paleta *antes* de que React monte nada — evita el parpadeo típico de las apps que resuelven el tema después del primer render.
 - **La paleta de color es un eje aparte del modo claro/oscuro, no un tercer valor mezclado con los otros dos.** Elegir "Océano" no te saca de "Automático" — cada paleta define su propio par claro/oscuro con los mismos nombres de variable que ya existían, así que ningún componente cambia una sola línea al elegir una. El logo y el gradiente de marca quedan fijos en las cuatro paletas a propósito: son identidad, no acento de UI.
 - **Recordatorios honestos sobre sus propios límites.** Sin backend no existe push garantizado con la app cerrada en todos los navegadores. Por eso hay dos niveles bien separados: uno garantizado (mientras la pestaña está abierta) y uno de mejor esfuerzo (Periodic Background Sync desde un service worker propio, que solo funciona en Chrome/Android con la PWA instalada) — y la interfaz nunca promete el segundo nivel como si fuera el primero.

@@ -138,6 +138,7 @@ export interface EjercicioPlanificado {
   nombre: string;
   seriesObjetivo: number;
   repeticionesObjetivo: number;
+  icono: string | null; // ver src/features/habitos/iconosFitness.ts
 }
 
 export interface DiaRutina {
@@ -163,15 +164,21 @@ export interface EjercicioTriserie {
   repeticiones: number;
 }
 
+/** Un set real de una sesión de fuerza — cada uno puede tener su propio peso/reps. */
+export interface SetRealizado {
+  repeticiones: number;
+  pesoKg: number;
+}
+
 export interface RegistroEjercicio {
   id: string;
   fecha: string; // ISO date (YYYY-MM-DD)
   tipo: TipoRegistroEjercicio;
-  // tipo === 'fuerza'
+  icono: string | null; // ver src/features/habitos/iconosFitness.ts, aplica a los 3 tipos
+  // tipo === 'fuerza' — un set puede variar de peso/reps respecto a otro
+  // dentro de la misma sesión (fatiga), por eso es un array y no un promedio.
   nombreEjercicio: string | null;
-  series: number | null;
-  repeticiones: number | null;
-  pesoKg: number | null;
+  seriesRealizadas: SetRealizado[] | null;
   // tipo === 'triserie_core' — siempre 3 ejercicios
   ejerciciosTriserie: EjercicioTriserie[] | null;
   // tipo === 'cardio'
@@ -186,6 +193,28 @@ export interface RegistroNutricion {
   proteinaObjetivoG: number;
   proteinaLogradaG: number;
   creatinaTomada: boolean;
+}
+
+// ---------- Calendario de fechas importantes ----------
+// Mismo patrón "un tipo, campos nullable por rama" que BloqueHorario /
+// RegistroEjercicio. proximaOcurrencia()/ocurrenciaEnMes() en
+// src/features/calendario/recurrencia.ts son las únicas funciones que
+// interpretan estos campos — no duplicar esa lógica en otro lado.
+
+export type TipoRecurrenciaFecha = 'unica' | 'anual' | 'mensual' | 'meses_especificos';
+
+export interface FechaImportante {
+  id: string;
+  nombre: string;
+  icono: string | null; // ver src/features/calendario/iconosFecha.ts
+  tipoRecurrencia: TipoRecurrenciaFecha;
+  fechaUnica: string | null; // 'unica' — ISO date completa (YYYY-MM-DD)
+  diaAnual: number | null; // 'anual' — 1..31
+  mesAnual: number | null; // 'anual' — 1..12
+  diaMensual: number | null; // 'mensual' — 1..31
+  diaMesesEspecificos: number | null; // 'meses_especificos' — 1..31
+  mesesEspecificos: number[] | null; // 'meses_especificos' — subconjunto de 1..12
+  notas: string | null;
 }
 
 // ---------- Respaldo global (import/export) ----------
@@ -206,6 +235,7 @@ export interface BackupCompleto {
     rutinas: Rutina[];
     registrosEjercicio: RegistroEjercicio[];
     registrosNutricion: RegistroNutricion[];
+    fechasImportantes: FechaImportante[];
   };
   config: {
     tema: 'auto' | 'claro' | 'oscuro';

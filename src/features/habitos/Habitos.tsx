@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,10 @@ import { RegistroEjercicioForm } from './RegistroEjercicioForm';
 import { NutricionHoy } from './NutricionHoy';
 import { NutricionHistorial } from './NutricionHistorial';
 import type { Rutina, RegistroEjercicio } from '@/types/models';
+
+const ReportesHabitos = lazy(() =>
+  import('./ReportesHabitos').then((m) => ({ default: m.ReportesHabitos })),
+);
 
 export function Habitos() {
   const rutinas = useLiveQuery(() => db.rutinas.toArray(), [], []);
@@ -30,6 +34,7 @@ export function Habitos() {
         <TabsTrigger value="rutina">Rutina</TabsTrigger>
         <TabsTrigger value="registro">Registro</TabsTrigger>
         <TabsTrigger value="nutricion">Nutrición</TabsTrigger>
+        <TabsTrigger value="reportes">Reportes</TabsTrigger>
       </TabsList>
 
       <TabsContent value="rutina" className="flex flex-col gap-4">
@@ -75,6 +80,14 @@ export function Habitos() {
       <TabsContent value="nutricion" className="flex flex-col gap-4">
         <NutricionHoy />
         <NutricionHistorial registros={registrosNutricion} />
+      </TabsContent>
+
+      <TabsContent value="reportes">
+        <Suspense
+          fallback={<p className="py-12 text-center text-sm text-muted-foreground">Cargando reportes…</p>}
+        >
+          <ReportesHabitos registros={registrosEjercicio} />
+        </Suspense>
       </TabsContent>
 
       <RutinaForm open={formRutinaAbierto} onOpenChange={setFormRutinaAbierto} rutina={rutinaEditando} />
